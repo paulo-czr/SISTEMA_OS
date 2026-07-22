@@ -1,0 +1,48 @@
+﻿using OS_API.Models.Enum;
+
+namespace OS_API.Helpers.Constantes
+{
+    public static class MapeamentoPermissoes
+    {
+        //esse metodo mapea as pemissao para ser chamado no repository e gravar as permissao por tipo de user
+        public static List<string> ObterPermissoes(TipoUsuario tipo)
+        {
+            return tipo switch
+            {
+                TipoUsuario.Administrador => new()
+                {
+                Permissoes.FuncionarioVisualizar,
+                Permissoes.FuncionarioCriar,
+                Permissoes. FuncionarioAtualizar,
+                // Cliente
+                Permissoes.ClienteCriar,
+                Permissoes.ClienteAtualizar,
+                // Ordem de Serviço
+                Permissoes.OSCriar,
+                Permissoes.OSAtualizar,
+                // Usuário
+                Permissoes.UsuarioVisualizar,
+                Permissoes.UsuarioAtualizar,
+                Permissoes.UsuarioRemover,
+                Permissoes.UsuarioGerenciarPermissoes
+
+                },
+
+            TipoUsuario.Gestor => new()
+            {
+                Permissoes.FuncionarioVisualizar,
+                Permissoes.ClienteCriar,
+                Permissoes.ClienteAtualizar
+            },
+
+                TipoUsuario.Tecnico => new()
+            {
+                Permissoes.FuncionarioVisualizar,
+                Permissoes.ClienteCriar
+            },
+
+                _ => new()
+            };
+        }
+    }
+}

@@ -1,0 +1,68 @@
+# ==========================================
+# VISUAL STUDIO & NETWORKING CACHE
+# ==========================================
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+# ==========================================
+# BUILD & PACOTES (C# / .NET)
+# ==========================================
+
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+*.nupkg
+packages/
+*.nuget.props
+*.nuget.targets
+
+# ==========================================
+# EDITOR DE CÓDIGO (VS CODE & OUTROS)
+# ==========================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains Rider / ReSharper
+_ReSharper*/
+*.resharper
+*.suo
+
+# ==========================================
+# SISTEMA OPERACIONAL (WINDOWS / MACOS)
+# ==========================================
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.stackdump
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ==========================================
+# BANCOS DE DADOS LOCAIS & CONFIGURAÇÕES SENSÍVEIS
+# ==========================================
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sqlite3
+
+# Arquivos de ambiente
+*.env
+*.env.local
+*.env.*.local
+appsettings.Development.json
+appsettings.Local.json
