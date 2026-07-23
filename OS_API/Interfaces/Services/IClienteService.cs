@@ -1,4 +1,5 @@
 ﻿using OS_API.DTOs.Cliente;
+using OS_API.Models.Cliente;
 
 namespace OS_API.Interfaces.Services
 {
@@ -13,6 +14,8 @@ namespace OS_API.Interfaces.Services
         Task<ClienteDto?> BuscarPorDocumento(string documento);
 
         Task<List<ClienteDto>> Listar();
+
+        Task<ClienteModel> BuscarOuFalhar(int id);
 
         Task Remover(int id);
     }

@@ -1,24 +1,20 @@
-﻿using OS_API.DTOs.OSFuncionario;
-using OS_API.Models;
-using OS_API.Models.Enum;
+﻿using OS_API.Models.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace OS_API.DTOs.OrdemServico
 {
-    public class BuscarOrdemServicoDto
+    public class AtualizarOrdemServicoDto
     {
-        public int IdOs { get; set; }
-
+        [Required(ErrorMessage = "É obrigatório preencher o campo Título.")]
         public string TituloOs { get; set; } = string.Empty;
 
         public string Descricao { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "É obrigatório informar o Tipo de Atendimento.")]
         public int IdTipoAtendimento { get; set; }
 
-        public string NomeTipoAtendimento { get; set; } = string.Empty;
-
+        [Required(ErrorMessage = "É obrigatório informar o Cliente.")]
         public int IdCliente { get; set; }
-
-        public string NomeCliente { get; set; } = string.Empty;
 
         public StatusOs Status { get; set; }
 
@@ -31,10 +27,5 @@ namespace OS_API.DTOs.OrdemServico
         public string? RelatorioTecnico { get; set; }
 
         public string? Observacao { get; set; }
-
-        public string CogigoPdf { get; set; } = string.Empty;
-
-        public List<OsFuncionarioDto> Funcionarios { get; set; } = new();
     }
-
 }

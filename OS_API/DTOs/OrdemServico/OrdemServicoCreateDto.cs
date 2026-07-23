@@ -1,4 +1,5 @@
-﻿using OS_API.Models.Enum;
+﻿using OS_API.DTOs.OSFuncionario;
+using OS_API.Models.Enum;
 using System.ComponentModel.DataAnnotations;
 
 namespace OS_API.DTOs.OrdemServico
@@ -16,18 +17,12 @@ namespace OS_API.DTOs.OrdemServico
         [Required(ErrorMessage = "É obrigatório informar o Cliente.")]
         public int IdCliente { get; set; }
 
-        public StatusOs Status { get; set; }
+        public DateTime? DataHoraInicio { get; set; }
 
-        public DateTime DataHoraInicio { get; set; }
-
-        public DateTime DataHoraFim { get; set; }
-
-        public DateOnly Prazo { get; set; }
-
-        public string? RelatorioTecnico { get; set; }
+        public DateTime? Prazo { get; set; }
 
         public string? Observacao { get; set; }
 
-        public List<int> Funcionarios { get; set; } = new();
+        public List<OsFuncionarioDto> Funcionarios { get; set; } = new();
     }
 }

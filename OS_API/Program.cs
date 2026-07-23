@@ -78,9 +78,11 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUnidadeTrabalho, UnidadeTrabalho>();
+builder.Services.AddScoped<IPermissaoRepository, PermissaoRepository>();
 builder.Services.AddScoped<IOsFuncionarioRepository, OsFuncionarioRepository>();
 builder.Services.AddScoped<IOsFuncionarioService, OsFuncionarioService>();
-builder.Services.AddScoped<IPermissaoRepository, PermissaoRepository>();
+builder.Services.AddScoped<IOrdemServicoRepository, OrdemServicoRepository>();
+builder.Services.AddScoped<IOrdemServicoService, OrdemServicoService>();
 
 // Cliente + integracao com o ViaCEP
 builder.Services.AddScoped<IClienteService, ClienteService>();

@@ -20,6 +20,10 @@ namespace OS_API.Data
         public DbSet<FuncionarioModel> Funcionarios { get; set; }
         public DbSet<PermissaoModel> Permissoes { get; set; }
         public DbSet<ClienteModel> Clientes { get; set; }
+        public DbSet<OrdemServicoModel> OrdensServico { get; set; }
+        public DbSet<OsFuncionarioModel> OsFuncionarios { get; set; }
+        
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

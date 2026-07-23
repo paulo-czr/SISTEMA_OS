@@ -4,6 +4,7 @@ using OS_API.Exceptionn;
 using OS_API.Interfaces.Repositories;
 using OS_API.Interfaces.Services;
 using OS_API.Mappings;
+using OS_API.Models;
 using OS_API.Models.Cliente;
 using OS_API.Models.Enum;
 using OS_API.Validation.Helpers;
@@ -43,7 +44,7 @@ namespace OS_API.Services
             return ClienteMapper.ParaDto(clienteModel);
         }
 
-        // Read
+        
         public async Task<ClienteDto?> BuscarPorId(int id)
         {
             var cliente = await BuscarClienteOuFalhar(id);
@@ -193,7 +194,7 @@ namespace OS_API.Services
             return dadosCep;
         }
 
-        private async Task<ClienteModel> BuscarClienteOuFalhar(int id)
+        public async Task<ClienteModel> BuscarClienteOuFalhar(int id)
         {
             var cliente = await _repository.BuscarPorId(id);
 
@@ -212,6 +213,16 @@ namespace OS_API.Services
                 return null;
 
             return string.IsNullOrWhiteSpace(razaoSocial) ? null : razaoSocial.Trim();
+        }
+
+        public async Task<ClienteModel> BuscarOuFalhar(int id)
+        {
+            var cliente = await _repository.BuscarPorId(id);
+
+            if (cliente == null)
+                throw new EntidadeNaoEncontradaException("Ordem de Serviço não encontrada.");
+
+            return cliente;
         }
 
         private static void AplicarDadosAtualizados(
@@ -242,5 +253,9 @@ namespace OS_API.Services
             cliente.Numero = numero;
             cliente.Ativo = ativo;
         }
+
+        
     }
+
+     
 }

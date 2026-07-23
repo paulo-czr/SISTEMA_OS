@@ -1,0 +1,17 @@
+﻿using OS_API.Models;
+
+namespace OS_API.Interfaces.Repositories
+{
+    public interface IOrdemServicoRepository
+    {
+        Task<OrdemServicoModel> Adicionar(OrdemServicoModel ordemServico);
+
+        Task<OrdemServicoModel?> BuscarPorId(int id);
+
+        Task<List<OrdemServicoModel>> Listar();
+
+        Task Atualizar(OrdemServicoModel ordemServico);
+
+        Task Remover(OrdemServicoModel ordemServico);
+    }
+}

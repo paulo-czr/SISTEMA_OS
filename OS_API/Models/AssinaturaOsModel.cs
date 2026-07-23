@@ -2,7 +2,7 @@
 {
     public class AssinaturaOsModel
     {
-        public int IdAssinatura { get; set; }
+        public int Id { get; set; }
 
         public int IdOs { get; set; }
 

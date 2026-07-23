@@ -21,9 +21,9 @@ namespace OS_API.Models
 
         public DateTime? DataHoraInicio { get; set; }
 
-        public DateTime DataHoraFim { get; set; }
+        public DateTime? DataHoraFim { get; set; }
 
-        public DateOnly? Prazo { get; set; }
+        public DateTime? Prazo { get; set; }
 
         public string? RelatorioTecnico { get; set; }
 
@@ -37,30 +37,29 @@ namespace OS_API.Models
 
         public ICollection<AssinaturaOsModel?> Assinatura { get; set; } = new List<AssinaturaOsModel?>();
 
-        public ICollection<OsFuncionarioModel> Tecnicos { get; set; } = new List<OsFuncionarioModel>();
+        public ICollection<OsFuncionarioModel> Funcionarios { get; set; } = new List<OsFuncionarioModel>();
+
+        protected OrdemServicoModel(){}
 
         public OrdemServicoModel(
             string tituloOs,
             int idTipoAtendimento,
             int idCliente,
-            StatusOs status,
             DateTime? dataHoraInicio,
-            DateTime dataHoraFim,
-            DateOnly? prazo,
+            DateTime? prazo,
             string descricao,
-            string? observacao,
-            string? observacao1)
+            string? observacao)
         {
             TituloOs = tituloOs;
             IdTipoAtendimento = idTipoAtendimento;
             IdCliente = idCliente;
-            Status = status;
             Status = StatusOs.Agendada;
             DataHoraInicio = dataHoraInicio;
-            DataHoraFim = dataHoraFim;
             Prazo = prazo;
             Descricao = descricao;
             Observacao = observacao;
         }
+
+       
     }
 }

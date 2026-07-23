@@ -12,10 +12,10 @@ namespace OS_API.Controllers
     {
         private readonly IUsuarioService _service;
 
-        //public UsuarioController(IUsuarioService service)
-        //{
-        //    _service = service;
-        //}
+        public PermissaoController(IUsuarioService service)
+        {
+            _service = service;
+        }
 
         //[HttpGet("{id}")]
         //[Authorize(Policy = Permissoes.UsuarioVisualizar)]

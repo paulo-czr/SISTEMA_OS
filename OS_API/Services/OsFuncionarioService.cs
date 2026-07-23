@@ -1,11 +1,6 @@
 ﻿using OS_API.Interfaces.Repositories;
 using OS_API.Interfaces.Services;
 using OS_API.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OS_API.Services
 {
@@ -18,58 +13,38 @@ namespace OS_API.Services
             _repository = repository;
         }
 
-        public async Task<OsFuncionarioModel> AdicionarAsync(OsFuncionarioModel osFuncionario)
+        public async Task AdicionarTecnicoAsync(int idOs, int idFuncionario, bool responsavel)
         {
-            // Regras de negócio aqui
+            // Validar se o funcionário já está vinculado a essa OS (evitar duplicidade).
+            // Validar se o funcionário existe e está ativo.
 
-            return await _repository.AdicionarAsync(osFuncionario);
+            var osFuncionario = new OsFuncionarioModel
+            {
+                IdOs = idOs,
+                IdFuncionario = idFuncionario,
+                Responsavel = responsavel
+            };
+
+            await _repository.AdicionarAsync(osFuncionario);
         }
 
-        public async Task<bool> RemoverAsync(int idOsFuncionario)
+        public async Task RemoverTecnicoAsync(int idOsFuncionario)
         {
-            return await _repository.RemoverAsync(idOsFuncionario);
+            // Validar se, ao remover, a OS não fica sem nenhum responsável.
+
+            await _repository.RemoverAsync(idOsFuncionario);
         }
 
-        public async Task<List<OsFuncionarioModel>> ObterPorOsAsync(int idOs)
+        public async Task DefinirResponsavelAsync(int idOs, int idFuncionario)
+        {
+            // Validar se o funcionário informado realmente está vinculado a essa OS.
+
+            await _repository.AlterarResponsavelAsync(idOs, idFuncionario);
+        }
+
+        public async Task<List<OsFuncionarioModel>> ObterTecnicosDaOsAsync(int idOs)
         {
             return await _repository.ObterPorOsAsync(idOs);
-        }
-
-        public async Task<OsFuncionarioModel?> ObterPorIdAsync(int idOsFuncionario)
-        {
-            return await _repository.ObterPorIdAsync(idOsFuncionario);
-        }
-
-        public async Task<OsFuncionarioModel> AlterarResponsavelAsync(int idOs, int idFuncionario)
-        {
-            // Aqui você pode implementar a regra:
-            // 1. Remove o responsável atual.
-            // 2. Define o novo responsável.
-
-            return await _repository.AlterarResponsavelAsync(idOs, idFuncionario);
-        }
-
-
-        // Métodos que implementei para poder compilar. Ajustar depois de acordo
-
-        public Task AdicionarTecnicoAsync(int idOs, int idFuncionario, bool responsavel)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task RemoverTecnicoAsync(int idOsFuncionario)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task DefinirResponsavelAsync(int idOs, int idFuncionario)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<OsFuncionarioModel>> ObterTecnicosDaOsAsync(int idOs)
-        {
-            throw new NotImplementedException();
         }
     }
 }

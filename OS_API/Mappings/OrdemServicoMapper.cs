@@ -1,5 +1,7 @@
 ﻿using OS_API.DTOs.OrdemServico;
+using OS_API.DTOs.OSFuncionario;
 using OS_API.Models;
+using System.Linq;
 
 namespace OS_API.Mappings
 {
@@ -11,12 +13,9 @@ namespace OS_API.Mappings
                 dto.TituloOs,
                 dto.IdTipoAtendimento,
                 dto.IdCliente,
-                dto.Status,
                 dto.DataHoraInicio,
-                dto.DataHoraFim,
                 dto.Prazo,
                 dto.Descricao,
-                dto.RelatorioTecnico,
                 dto.Observacao
             );
         }
@@ -33,30 +32,34 @@ namespace OS_API.Mappings
                 IdCliente = model.IdCliente,
                 NomeCliente = model.Cliente.NomeFantasia,
                 Status = model.Status,
-                DataHoraInicio = (DateTime)model.DataHoraInicio,
-                DataHoraFim = model.DataHoraFim,
-                Prazo = (DateOnly)model.Prazo,
+                DataHoraInicio = model.DataHoraInicio.Value,
+                DataHoraFim = model.DataHoraFim.Value,
+                Prazo = model.Prazo.Value,
                 RelatorioTecnico = model.RelatorioTecnico,
                 Observacao = model.Observacao,
                 CogigoPdf = model.CogigoPdf,
-                Funcionarios = model.Tecnicos
-                    .Select(t => t.IdFuncionario)
+                Funcionarios = model.Funcionarios
+                    .Select(f => new OsFuncionarioDto
+                    {
+                        IdFuncionario = f.IdFuncionario,
+                        Responsavel = f.Responsavel
+                    })
                     .ToList()
             };
         }
 
-        //public static void AtualizarModel(OrdemServicoModel model, AtualizarOrdemServicoDto dto)
-        //{
-        //    model.TituloOs = dto.TituloOs;
-        //    model.SolicitacaoCliente = dto.SolicitacaoCliente;
-        //    model.IdTipoAtendimento = dto.IdTipoAtendimento;
-        //    model.IdCliente = dto.IdCliente;
-        //    model.Status = dto.Status;
-        //    model.DataHoraInicio = dto.DataHoraInicio;
-        //    model.DataHoraFim = dto.DataHoraFim;
-        //    model.Prazo = dto.Prazo;
-        //    model.RelatorioTecnico = dto.RelatorioTecnico;
-        //    model.Observacao = dto.Observacao;
-        //}
+        public static void AtualizarModel(OrdemServicoModel model, AtualizarOrdemServicoDto dto)
+        {
+            model.TituloOs = dto.TituloOs;
+            model.Descricao = dto.Descricao;
+            model.IdTipoAtendimento = dto.IdTipoAtendimento;
+            model.IdCliente = dto.IdCliente;
+            model.Status = dto.Status;
+            model.DataHoraInicio = dto.DataHoraInicio;
+            model.DataHoraFim = dto.DataHoraFim;
+            model.Prazo = dto.Prazo;
+            model.RelatorioTecnico = dto.RelatorioTecnico;
+            model.Observacao = dto.Observacao;
+        }
     }
 }

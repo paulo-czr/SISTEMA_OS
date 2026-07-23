@@ -2,7 +2,7 @@
 {
     public class TipoAtendimento
     {
-        public int IdTipoAtendimento { get; set; }
+        public int Id { get; set; }
         public string? Descricao { get; set; }
         public ICollection<OrdemServicoModel> OrdensServico { get; set; } = new List<OrdemServicoModel>();
 
