@@ -13,7 +13,7 @@ namespace OS_API.Mappings
                 Id = model.Id,
                 Usuario = model.UserName!,
                 Email = model.Email!,
-                Token = token
+                Token = token 
             };
         }
 
@@ -25,7 +25,9 @@ namespace OS_API.Mappings
                 UserName = model.UserName!,
                 Email = model.Email!,
                 Ativo = model.Ativo,
-                DataCadastro = model.DataCadastro
+                DataCadastro = model.DataCadastro,
+                IdFuncionario = model.Funcionario?.Id,
+                NomeFuncionario = model.Funcionario?.Nome
             };
         }
 

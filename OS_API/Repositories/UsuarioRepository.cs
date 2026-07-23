@@ -33,7 +33,7 @@ namespace OS_API.Repositories
             UsuarioModel? u;
             if (usuario.Contains("@"))
             {
-               u = await BuscarPeloEmail(usuario);
+                u = await BuscarPeloEmail(usuario);
             }
             else
             {
@@ -44,13 +44,19 @@ namespace OS_API.Repositories
 
         public async Task<UsuarioModel?> BuscarPorId(string id)
         {
-            return await _userManager.FindByIdAsync(id);
+            // FindByIdAsync não permite Include, então consultamos direto em Users
+            // (IQueryable normal do EF) pra trazer o Funcionario vinculado junto.
+            return await _userManager.Users
+                .Include(u => u.Funcionario)
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<List<UsuarioModel>> Listar()
         {
             // _userManager.Users é um IQueryable direto sobre a tabela do Identity.
-            return await _userManager.Users.ToListAsync();
+            return await _userManager.Users
+                .Include(u => u.Funcionario)
+                .ToListAsync();
         }
 
         public async Task Atualizar(UsuarioModel usuario)
@@ -106,7 +112,7 @@ namespace OS_API.Repositories
 
             foreach (var permissao in permissoes)
             {
-                await _userManager.AddClaimAsync( usuario, new Claim("Permissao", permissao));
+                await _userManager.AddClaimAsync(usuario, new Claim("Permissao", permissao));
             }
         }
 

@@ -11,5 +11,9 @@
         public bool Ativo { get; set; }
 
         public DateTime DataCadastro { get; set; }
+
+        public int? IdFuncionario { get; set; }
+
+        public string? NomeFuncionario { get; set; }
     }
 }

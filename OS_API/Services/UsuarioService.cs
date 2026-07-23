@@ -64,8 +64,14 @@ namespace OS_API.Services
             var usuario = await BuscarOuFalhar(id);
 
             // Validar se o novo UserName já pertence a outro usuário.
+            var usuarioComMesmoUserName = await _repository.BuscarPeloUserName(dto.UserName);
+            if (usuarioComMesmoUserName != null && usuarioComMesmoUserName.Id != usuario.Id)
+                throw new ValidacaoException("user name ja cadastrado");
 
             // Validar se o novo Email já pertence a outro usuário.
+            var usuarioComMesmoEmail = await _repository.BuscarPeloEmail(dto.Email);
+            if (usuarioComMesmoEmail != null && usuarioComMesmoEmail.Id != usuario.Id)
+                throw new ValidacaoException("Email ja cadastrado");
 
             UsuarioMapper.AtualizarModel(usuario, dto);
 
@@ -77,12 +83,6 @@ namespace OS_API.Services
         public async Task Remover(string id)
         {
             var usuario = await BuscarOuFalhar(id);
-
-            // Validar se o usuário possui Funcionario vinculado antes de remover
-            // (hoje a remoção aqui não apaga o Funcionario relacionado).
-
-            // Validar se o usuário está vinculado como responsável em alguma OS em andamento.
-
             await _repository.Remover(usuario);
         }
 
@@ -90,7 +90,7 @@ namespace OS_API.Services
         {
             var usuario = await BuscarOuFalhar(id);
 
-            // Nomes das permissões (claims) que esse usuário possui hoje.
+            // Nomes das permissões (claims) que esse usuário
             var nomesVinculados = await _repository.BuscarPermissoes(usuario);
 
             var todasPermissoes = await _permissaoRepository.Listar();

@@ -159,8 +159,11 @@ using (var scope = app.Services.CreateScope())
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    await RoleSeed.SeedRolesAsync(roleManager);
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UsuarioModel>>();
+    var usuarioRepository = scope.ServiceProvider.GetRequiredService<IUsuarioRepository>();
 
+    await RoleSeed.SeedRolesAsync(roleManager);
+    await AdminUserSeed.SeedAdminAsync(userManager, usuarioRepository);
     await PermissaoSeed.SeedPermissoesAsync(context);
 }
 

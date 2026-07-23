@@ -57,12 +57,6 @@ namespace OS_API.Services
         public async Task<FuncionarioDto?> BuscarPorId(int id)
         {
             var tecnico = await _repository.BuscarPorId(id);
-
-            if (tecnico == null)
-            {
-                throw new EntidadeNaoEncontradaException("Técnico não encontrado.");
-            }
-
             return FuncionarioMapper.ParaDto(tecnico);
         }
 
@@ -75,18 +69,7 @@ namespace OS_API.Services
                 .ToList();
         }
 
-        //public async Task Atualizar(int id, AtualizarTecnicoDto dto)
-        //{
-        //    var tecnico = await _repository.BuscarPorId(id);
 
-        //    if (tecnico == null)
-        //        throw new Exception("Técnico não encontrado.");
-
-        //    tecnico.Atualizar(dto.Nome, dto.Telefone, dto.Email);
-        //    tecnico.AlterarStatus(dto.Ativo);
-
-        //    await _repository.Atualizar(tecnico);
-        //}
 
         public async Task<FuncionarioDto> Atualizar(int id, AtualizarFuncionarioDto dto)
         {
@@ -95,15 +78,12 @@ namespace OS_API.Services
             if (funcionario == null)
                 throw new EntidadeNaoEncontradaException("Funcionário não encontrado.");
 
-            // Validar se o novo UserName/Email já pertence a outro usuário
-            // (essa checagem já acontece dentro de _usuarioService.Atualizar).
-
             funcionario.AtualizarNome(dto.Nome);
             await _repository.Atualizar(funcionario);
 
             // Funcionario "é" um Usuario: os dados de conta (UserName/Email/Ativo)
-            // são atualizados através do UsuarioService, reaproveitando as validações
-            // que já existem lá.
+            // são atualizados através do UsuarioService, que já valida duplicidade
+            // de UserName/Email internamente.
             var atualizarUsuarioDto = new AtualizarUsuarioDto
             {
                 UserName = dto.UserName,
@@ -119,12 +99,26 @@ namespace OS_API.Services
 
         public async Task Remover(int id)
         {
-            var tecnico = await _repository.BuscarPorId(id);
+            try
+            {
+                await _unidadeTrabalho.IniciarTransacaoAsync();
 
-            if (tecnico == null)
-                throw new Exception("Técnico não encontrado.");
+                var funcionario = await _repository.BuscarPorId(id);
 
-            await _repository.Remover(tecnico);
+                //ver se está em alguma Os
+
+                //------------------------------
+                await _repository.Remover(funcionario!);
+                await _usuarioService.Remover(funcionario!.UsuarioId);
+                await _unidadeTrabalho.ConfirmarTransacaoAsync();
+
+            }
+            catch
+            {
+                await _unidadeTrabalho.DesfazerTransacaoAsync();
+                throw;
+            }
+           
         }
     }
 

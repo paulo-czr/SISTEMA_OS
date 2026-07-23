@@ -24,31 +24,6 @@ namespace OS_API.Controllers
             _userManager = userManager;
         }
 
-        //classe teste
-        [HttpPost("registrar")]
-        public async Task<IActionResult> Registrar()
-        {
-            var usuario = new UsuarioModel
-            {
-                UserName = "Carlos",
-                Email = "carlos@email.com",
-               
-
-            };
-            var resultado = await _userManager.CreateAsync(
-                usuario,
-                "Ab1234"
-            );
-
-            if (!resultado.Succeeded)
-            {
-                return BadRequest(resultado.Errors);
-            }
-            // Adiciona uma Claim de permissão ao usuário
-           await _userManager.AddClaimAsync( usuario, new Claim("Permissao", Permissoes.FuncionarioVisualizar));
-            return Ok("Usuário criado");
-        }
-
         [HttpPost("login")]
         public async Task<IActionResult> Login(AuthCreateDto dto)
         {
