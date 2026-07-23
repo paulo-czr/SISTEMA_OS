@@ -34,9 +34,14 @@ namespace OS_API.Services
             // Validar se o Tipo de Atendimento informado existe.
 
             // Validar se existe apenas um funcionário marcado como responsável em dto.Funcionarios.
-            if (dto.Funcionarios.Count(f => f.Responsavel = true) != 1)
+            if (dto.Funcionarios.Count(f => f.Responsavel) != 1)
             {
                 throw new EntidadeNaoEncontradaException("Deve existir exatamente um funcionário responsável.");
+            }
+            // Validar se o funcionário não foi mandado varias vezes
+            if (dto.Funcionarios.GroupBy(f => f.IdFuncionario).Any(g => g.Count() > 1))
+            {
+                throw new EntidadeNaoEncontradaException("Um funcionário não pode ser informado mais de uma vez.");
             }
 
             var ordemServico = OrdemServicoMapper.ParaModel(dto);
@@ -68,9 +73,9 @@ namespace OS_API.Services
                 throw;
             }
 
-            //var ordemServicoCompleta = await BuscarOuFalhar(ordemServico.IdOs);
+            var ordemServicoCompleta = await BuscarOuFalhar(ordemServico.IdOs);
 
-            return OrdemServicoMapper.ParaDto(ordemServico);
+            return OrdemServicoMapper.ParaDto(ordemServicoCompleta);
         }
 
         public async Task<BuscarOrdemServicoDto> Atualizar(int id, AtualizarOrdemServicoDto dto)
@@ -115,12 +120,13 @@ namespace OS_API.Services
             await _repository.Remover(ordemServico);
         }
 
+
         private async Task<OrdemServicoModel> BuscarOuFalhar(int id)
         {
             var ordemServico = await _repository.BuscarPorId(id);
 
             if (ordemServico == null)
-                throw new EntidadeNaoEncontradaException("Cliente não encontrada.");
+                throw new EntidadeNaoEncontradaException("Ordem de Serviço não encontrada.");
 
             return ordemServico;
         }
