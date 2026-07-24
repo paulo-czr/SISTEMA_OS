@@ -6,6 +6,7 @@ using OS_API.Data;
 using OS_API.Data.Seed;
 using OS_API.Exceptionn;
 using OS_API.Helpers.Constantes;
+using OS_API.Helpers.UsuarioLogado;
 using OS_API.Interfaces.Repositories;
 using OS_API.Interfaces.Services;
 using OS_API.Models;
@@ -83,11 +84,17 @@ builder.Services.AddScoped<IOsFuncionarioRepository, OsFuncionarioRepository>();
 builder.Services.AddScoped<IOsFuncionarioService, OsFuncionarioService>();
 builder.Services.AddScoped<IOrdemServicoRepository, OrdemServicoRepository>();
 builder.Services.AddScoped<IOrdemServicoService, OrdemServicoService>();
+builder.Services.AddScoped<ITipoAtendimentoRepository, TipoAtendimentoRepository>();
+builder.Services.AddScoped<ITipoAtendimentoService, TipoAtendimentoService>();
 
 // Cliente + integracao com o ViaCEP
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddHttpClient<IViaCepService, ViaCepService>();
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IUsuarioLogado, UsuarioLogado>();
 
 // Configuracao CORS para permitir o Front-end acessar a API
 builder.Services.AddCors(options =>

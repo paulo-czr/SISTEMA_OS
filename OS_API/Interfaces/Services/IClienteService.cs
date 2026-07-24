@@ -15,7 +15,7 @@ namespace OS_API.Interfaces.Services
 
         Task<List<ClienteDto>> Listar();
 
-        Task<ClienteModel> BuscarOuFalhar(int id);
+        Task<ClienteModel> BuscarClienteOuFalhar(int id);
 
         Task Remover(int id);
     }

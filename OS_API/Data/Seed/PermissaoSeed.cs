@@ -29,7 +29,6 @@ namespace OS_API.Data.Seed
                     Descricao = "Permite atualizar funcionários.",
                     Modulo = "Funcionario"
                 },
-
                 // Cliente
                 new PermissaoModel
                 {
@@ -43,7 +42,6 @@ namespace OS_API.Data.Seed
                     Descricao = "Permite atualizar clientes.",
                     Modulo = "Cliente"
                 },
-
                 // Ordem de Serviço
                 new PermissaoModel
                 {
@@ -57,7 +55,6 @@ namespace OS_API.Data.Seed
                     Descricao = "Permite atualizar ordens de serviço.",
                     Modulo = "OS"
                 },
-
                 // Usuário
                 new PermissaoModel
                 {
@@ -82,6 +79,19 @@ namespace OS_API.Data.Seed
                     Nome = Permissoes.UsuarioGerenciarPermissoes,
                     Descricao = "Permite gerenciar permissões dos usuários.",
                     Modulo = "Usuario"
+                },
+                // Tipo de Atendimento
+                new PermissaoModel
+                {
+                    Nome = Permissoes.TipoAtendimentoCriar,
+                    Descricao = "Permite cadastrar tipos de atendimento.",
+                    Modulo = "TipoAtendimento"
+                },
+                new PermissaoModel
+                {
+                    Nome = Permissoes.TipoAtendimentoAtualizar,
+                    Descricao = "Permite atualizar tipos de atendimento.",
+                    Modulo = "TipoAtendimento"
                 }
             };
 

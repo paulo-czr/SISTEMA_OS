@@ -215,15 +215,6 @@ namespace OS_API.Services
             return string.IsNullOrWhiteSpace(razaoSocial) ? null : razaoSocial.Trim();
         }
 
-        public async Task<ClienteModel> BuscarOuFalhar(int id)
-        {
-            var cliente = await _repository.BuscarPorId(id);
-
-            if (cliente == null)
-                throw new EntidadeNaoEncontradaException("Ordem de Serviço não encontrada.");
-
-            return cliente;
-        }
 
         private static void AplicarDadosAtualizados(
             ClienteModel cliente,

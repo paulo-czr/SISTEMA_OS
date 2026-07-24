@@ -1,9 +1,11 @@
 ﻿using OS_API.DTOs.OrdemServico;
 using OS_API.Exceptionn;
+using OS_API.Helpers.UsuarioLogado;
 using OS_API.Interfaces.Repositories;
 using OS_API.Interfaces.Services;
 using OS_API.Mappings;
 using OS_API.Models;
+using OS_API.Models.Enum;
 
 namespace OS_API.Services
 {
@@ -13,25 +15,33 @@ namespace OS_API.Services
         private readonly IOsFuncionarioRepository _osFuncionarioRepository;
         private readonly IUnidadeTrabalho _unidadeTrabalho;
         private readonly IClienteService _clienteService;
+        private readonly ITipoAtendimentoService _TipoAtendimento;
+        private readonly IUsuarioLogado _usuarioLogado;
 
         public OrdemServicoService(
             IOrdemServicoRepository repository,
             IOsFuncionarioRepository osFuncionarioRepository,
             IUnidadeTrabalho unidadeTrabalho,
-            IClienteService clienteService)
+            IClienteService clienteService,
+            ITipoAtendimentoService tipoAtendimento,
+            IUsuarioLogado usuarioLogado)
         {
             _repository = repository;
             _osFuncionarioRepository = osFuncionarioRepository;
             _unidadeTrabalho = unidadeTrabalho;
             _clienteService = clienteService;
+            _TipoAtendimento = tipoAtendimento;
+            _usuarioLogado = usuarioLogado;
         }
 
         public async Task<BuscarOrdemServicoDto> Criar(CriarOrdemServicoDto dto)
         {
             // Validar se o Cliente informado existe.
-            var cliente = await _clienteService.BuscarOuFalhar(dto.IdCliente);
+            var cliente = await _clienteService.BuscarClienteOuFalhar(dto.IdCliente);
 
             // Validar se o Tipo de Atendimento informado existe.
+            var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdCliente);
+
 
             // Validar se existe apenas um funcionário marcado como responsável em dto.Funcionarios.
             if (dto.Funcionarios.Count(f => f.Responsavel) != 1)
@@ -75,6 +85,10 @@ namespace OS_API.Services
 
             var ordemServicoCompleta = await BuscarOuFalhar(ordemServico.IdOs);
 
+            //if (!_usuarioLogado.Autenticado)
+            //    throw new UnauthorizedAccessException();
+            //var idUsuario = _usuarioLogado.IdUsuario;
+
             return OrdemServicoMapper.ParaDto(ordemServicoCompleta);
         }
 
@@ -82,11 +96,16 @@ namespace OS_API.Services
         {
             // Validar se o OS
             var ordemServico = await BuscarOuFalhar(id);
+            // Validar se o Cliente informado existe.
+            var cliente = await _clienteService.BuscarClienteOuFalhar(dto.IdCliente);
+            // Validar se o Tipo de Atendimento informado existe.
+            var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdCliente);
 
-            // Validar se o Cliente informado existe (caso esteja sendo alterado).
-            // Validar se o Tipo de Atendimento informado existe (caso esteja sendo alterado).
-
-            // Validar as regras de transição de Status (ex.: não permitir voltar de Concluída para Agendada).
+            // Validar as regras de transição de Status
+            if (dto.Status == StatusOs.Concluida)
+            {
+                throw new ValidacaoException("Essa OS ja está concluida.");
+            }
 
             OrdemServicoMapper.AtualizarModel(ordemServico, dto);
 
@@ -109,6 +128,35 @@ namespace OS_API.Services
             return ordensServico
                 .Select(OrdemServicoMapper.ParaDto)
                 .ToList();
+        }
+
+        // Só atualiza o relatório técnico, sem tocar em mais nenhum campo da OS.
+        public async Task<BuscarOrdemServicoDto> AtualizarRelatorio(int id, AtualizarRelatorioDto dto)
+        {
+            var ordemServico = await BuscarOuFalhar(id);
+
+            // Validar se o funcionário logado realmente está vinculado a essa OS (feito no controller/policy).
+
+            ordemServico.RelatorioTecnico = dto.RelatorioTecnico;
+
+            await _repository.Atualizar(ordemServico);
+
+            return OrdemServicoMapper.ParaDto(ordemServico);
+        }
+
+        // Só atualiza o status da OS, sem tocar em mais nenhum campo.
+        public async Task<BuscarOrdemServicoDto> AlterarStatus(int id, AlterarStatusOsDto dto)
+        {
+            var ordemServico = await BuscarOuFalhar(id);
+
+            // Validar a transição de status (ex.: não permitir voltar de Concluída pra Agendada),
+            // caso um dia isso seja necessário.
+
+            ordemServico.Status = dto.Status;
+
+            await _repository.Atualizar(ordemServico);
+
+            return OrdemServicoMapper.ParaDto(ordemServico);
         }
 
         public async Task Remover(int id)

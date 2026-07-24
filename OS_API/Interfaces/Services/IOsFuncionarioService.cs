@@ -1,9 +1,4 @@
-﻿using OS_API.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OS_API.DTOs.OSFuncionario;
 
 namespace OS_API.Interfaces.Services
 {
@@ -15,6 +10,6 @@ namespace OS_API.Interfaces.Services
 
         Task DefinirResponsavelAsync(int idOs, int idFuncionario);
 
-        Task<List<OsFuncionarioModel>> ObterTecnicosDaOsAsync(int idOs);
+        Task<List<OsFuncionarioDetalheDto>> ObterTecnicosDaOsAsync(int idOs);
     }
 }

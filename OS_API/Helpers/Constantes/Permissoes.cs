@@ -22,5 +22,9 @@
         public const string UsuarioRemover = "Usuario.Remover";
         public const string UsuarioGerenciarPermissoes = "Usuario.GerenciarPermissoes";
 
+        // Tipo de Atendimento
+        public const string TipoAtendimentoCriar = "TipoAtendimento.Criar";
+        public const string TipoAtendimentoAtualizar = "TipoAtendimento.Atualizar";
+
     }
 }

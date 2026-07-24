@@ -12,6 +12,13 @@ namespace OS_API.Interfaces.Services
 
         Task<List<BuscarOrdemServicoDto>> Listar();
 
+        // Método separado só pro funcionário preencher/editar o relatório dele,
+        // sem precisar (nem poder) mexer nos outros campos da OS.
+        Task<BuscarOrdemServicoDto> AtualizarRelatorio(int id, AtualizarRelatorioDto dto);
+
+        // Método separado só pra mudar o status da OS.
+        Task<BuscarOrdemServicoDto> AlterarStatus(int id, AlterarStatusOsDto dto);
+
         Task Remover(int id);
     }
 }

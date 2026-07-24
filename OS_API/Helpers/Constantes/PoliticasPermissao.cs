@@ -41,6 +41,12 @@ namespace OS_API.Helpers.Constantes
             options.AddPolicy(Permissoes.UsuarioGerenciarPermissoes,
                 policy => policy.RequireClaim("Permissao", Permissoes.UsuarioGerenciarPermissoes));
 
+            options.AddPolicy(Permissoes.TipoAtendimentoCriar,
+                policy => policy.RequireClaim("Permissao", Permissoes.TipoAtendimentoCriar));
+
+            options.AddPolicy(Permissoes.TipoAtendimentoAtualizar,
+                policy => policy.RequireClaim("Permissao", Permissoes.TipoAtendimentoAtualizar));
+
         }
     }
 }

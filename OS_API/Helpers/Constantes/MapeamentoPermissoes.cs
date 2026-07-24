@@ -24,23 +24,22 @@ namespace OS_API.Helpers.Constantes
                 Permissoes.UsuarioVisualizar,
                 Permissoes.UsuarioAtualizar,
                 Permissoes.UsuarioRemover,
-                Permissoes.UsuarioGerenciarPermissoes
-
+                Permissoes.UsuarioGerenciarPermissoes,
+                // Tipo de Atendimento
+                Permissoes.TipoAtendimentoCriar,
+                Permissoes.TipoAtendimentoAtualizar
                 },
-
-            TipoUsuario.Gestor => new()
+                TipoUsuario.Gestor => new()
             {
                 Permissoes.FuncionarioVisualizar,
                 Permissoes.ClienteCriar,
                 Permissoes.ClienteAtualizar
             },
-
                 TipoUsuario.Tecnico => new()
             {
                 Permissoes.FuncionarioVisualizar,
                 Permissoes.ClienteCriar
             },
-
                 _ => new()
             };
         }
