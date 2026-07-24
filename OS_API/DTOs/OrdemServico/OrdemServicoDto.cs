@@ -16,6 +16,8 @@ namespace OS_API.DTOs.OrdemServico
 
         public string NomeTipoAtendimento { get; set; } = string.Empty;
 
+        public string IdUsuarioRegistrou { get; set; }
+
         public int IdCliente { get; set; }
 
         public string NomeCliente { get; set; } = string.Empty;

@@ -25,6 +25,11 @@ namespace OS_API.Data.Configurations
                    .HasForeignKey(o => o.IdCliente)
                    .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasOne(o => o.UsuarioQueRegistrou)
+                   .WithMany()
+                   .HasForeignKey(o => o.IdUsuarioQueRegistrou)
+                   .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasOne(o => o.TipoAtendimento)
                    .WithMany(t => t.OrdensServico)
                    .HasForeignKey(o => o.IdTipoAtendimento)

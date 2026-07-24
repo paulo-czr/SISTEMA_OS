@@ -1,14 +1,17 @@
-﻿using System.Security.Claims;
+﻿using OS_API.Interfaces.Services;
+using System.Security.Claims;
 
 namespace OS_API.Helpers.UsuarioLogado
 {
     public class UsuarioLogado : IUsuarioLogado
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUsuarioService _usuarioService;
 
-        public UsuarioLogado(IHttpContextAccessor httpContextAccessor)
+        public UsuarioLogado(IHttpContextAccessor httpContextAccessor, IUsuarioService usuarioService)
         {
             _httpContextAccessor = httpContextAccessor;
+            _usuarioService = usuarioService;
         }
 
         private ClaimsPrincipal? Usuario =>
@@ -28,5 +31,21 @@ namespace OS_API.Helpers.UsuarioLogado
 
         public IEnumerable<Claim> Claims =>
             Usuario?.Claims ?? Enumerable.Empty<Claim>();
+
+        public string retornarUserLogado()
+        {
+            //pegar o usuario que registrou
+            if (!Autenticado)
+                throw new UnauthorizedAccessException();
+            return IdUsuario!;
+        }
+
+        public async Task<int> RetornarIdFuncionarioLogado()
+        {
+            var usuario = await _usuarioService.BuscarPorId(retornarUserLogado());
+            return (int)usuario.IdFuncionario!;
+        }
+
+
     }
 }

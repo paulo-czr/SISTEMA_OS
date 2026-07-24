@@ -64,5 +64,12 @@ namespace OS_API.Repositories
 
             return vinculos.First(x => x.IdFuncionario == idFuncionario);
         }
+
+        public async Task<OsFuncionarioModel?> BuscarPorIdOsFunc(int idOs, int idFuncionario)
+        {
+            return await _context.OsFuncionarios
+                .FirstOrDefaultAsync(x => x.IdOs == idOs &&
+                                          x.IdFuncionario == idFuncionario);
+        }
     }
 }

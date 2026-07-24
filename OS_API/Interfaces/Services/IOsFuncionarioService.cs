@@ -10,6 +10,10 @@ namespace OS_API.Interfaces.Services
 
         Task DefinirResponsavelAsync(int idOs, int idFuncionario);
 
+        Task<Boolean> VerificarTecnicoExisteAsync(int idOs, int idFuncionario);
+
+        Task<Boolean> VerificarTecnicoEResponsavelAsync(int idOs, int idFuncionario);
+
         Task<List<OsFuncionarioDetalheDto>> ObterTecnicosDaOsAsync(int idOs);
     }
 }

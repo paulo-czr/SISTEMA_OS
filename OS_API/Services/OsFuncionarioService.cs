@@ -73,5 +73,26 @@ namespace OS_API.Services
                 .Select(OsFuncionarioMapper.ParaDto)
                 .ToList();
         }
+
+        public async Task<bool> VerificarTecnicoExisteAsync(int idOs, int idFuncionario)
+        {  
+            var osFunc = await _repository.BuscarPorIdOsFunc(idOs, idFuncionario);
+            if(osFunc != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> VerificarTecnicoEResponsavelAsync(int idOs, int idFuncionario)
+        {
+            var osFunc = await _repository.BuscarPorIdOsFunc(idOs, idFuncionario);
+
+            if (osFunc.Responsavel)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

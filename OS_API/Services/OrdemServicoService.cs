@@ -4,6 +4,7 @@ using OS_API.Helpers.UsuarioLogado;
 using OS_API.Interfaces.Repositories;
 using OS_API.Interfaces.Services;
 using OS_API.Mappings;
+using OS_API.Migrations;
 using OS_API.Models;
 using OS_API.Models.Enum;
 
@@ -13,10 +14,13 @@ namespace OS_API.Services
     {
         private readonly IOrdemServicoRepository _repository;
         private readonly IOsFuncionarioRepository _osFuncionarioRepository;
+        private readonly IOsFuncionarioService _osFuncionarioService;
         private readonly IUnidadeTrabalho _unidadeTrabalho;
         private readonly IClienteService _clienteService;
         private readonly ITipoAtendimentoService _TipoAtendimento;
         private readonly IUsuarioLogado _usuarioLogado;
+        private readonly IUsuarioService _usuarioService;
+        
 
         public OrdemServicoService(
             IOrdemServicoRepository repository,
@@ -24,14 +28,17 @@ namespace OS_API.Services
             IUnidadeTrabalho unidadeTrabalho,
             IClienteService clienteService,
             ITipoAtendimentoService tipoAtendimento,
-            IUsuarioLogado usuarioLogado)
+            IUsuarioLogado usuarioLogado,
+            IUsuarioService usuarioService,
+            IOsFuncionarioService osFuncionarioService)
         {
             _repository = repository;
-            _osFuncionarioRepository = osFuncionarioRepository;
             _unidadeTrabalho = unidadeTrabalho;
             _clienteService = clienteService;
             _TipoAtendimento = tipoAtendimento;
             _usuarioLogado = usuarioLogado;
+            _osFuncionarioService = osFuncionarioService;
+            _osFuncionarioRepository = osFuncionarioRepository;
         }
 
         public async Task<BuscarOrdemServicoDto> Criar(CriarOrdemServicoDto dto)
@@ -54,12 +61,16 @@ namespace OS_API.Services
                 throw new EntidadeNaoEncontradaException("Um funcionário não pode ser informado mais de uma vez.");
             }
 
-            var ordemServico = OrdemServicoMapper.ParaModel(dto);
+            //pegar o usuario que registrou
+            var idUsuario = _usuarioLogado.retornarUserLogado();
+
+            var ordemServico = OrdemServicoMapper.ParaModel(dto, idUsuario);
 
             await _unidadeTrabalho.IniciarTransacaoAsync();
 
             try
             {
+             
                 ordemServico = await _repository.Adicionar(ordemServico);
 
                 // Salvar o relacionamento dos funcionários vinculados à OS.
@@ -85,9 +96,6 @@ namespace OS_API.Services
 
             var ordemServicoCompleta = await BuscarOuFalhar(ordemServico.IdOs);
 
-            //if (!_usuarioLogado.Autenticado)
-            //    throw new UnauthorizedAccessException();
-            //var idUsuario = _usuarioLogado.IdUsuario;
 
             return OrdemServicoMapper.ParaDto(ordemServicoCompleta);
         }
@@ -101,11 +109,8 @@ namespace OS_API.Services
             // Validar se o Tipo de Atendimento informado existe.
             var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdCliente);
 
-            // Validar as regras de transição de Status
-            if (dto.Status == StatusOs.Concluida)
-            {
-                throw new ValidacaoException("Essa OS ja está concluida.");
-            }
+            // não atualizar se tiver concluida
+            falharSeOSConcluida(ordemServico);
 
             OrdemServicoMapper.AtualizarModel(ordemServico, dto);
 
@@ -134,9 +139,14 @@ namespace OS_API.Services
         public async Task<BuscarOrdemServicoDto> AtualizarRelatorio(int id, AtualizarRelatorioDto dto)
         {
             var ordemServico = await BuscarOuFalhar(id);
-
-            // Validar se o funcionário logado realmente está vinculado a essa OS (feito no controller/policy).
-
+            falharSeOSConcluida(ordemServico);
+            //buscar id funcionario logado
+            int idFuncionario = await _usuarioLogado.RetornarIdFuncionarioLogado();
+            //validar se o funcionario está na OS e é o responsavel
+            if(!await _osFuncionarioService.VerificarTecnicoEResponsavelAsync(ordemServico.IdOs, idFuncionario))
+            {
+                throw new ValidacaoException("Somente o funcionario pode inserir o relatorio.");
+            }
             ordemServico.RelatorioTecnico = dto.RelatorioTecnico;
 
             await _repository.Atualizar(ordemServico);
@@ -149,9 +159,8 @@ namespace OS_API.Services
         {
             var ordemServico = await BuscarOuFalhar(id);
 
-            // Validar a transição de status (ex.: não permitir voltar de Concluída pra Agendada),
-            // caso um dia isso seja necessário.
-
+            // Validar a transição de status 
+            falharSeOSConcluida(ordemServico);
             ordemServico.Status = dto.Status;
 
             await _repository.Atualizar(ordemServico);
@@ -168,7 +177,13 @@ namespace OS_API.Services
             await _repository.Remover(ordemServico);
         }
 
-
+        private void falharSeOSConcluida(OrdemServicoModel ordemServico)
+        {
+            if (ordemServico.Status == StatusOs.Concluida)
+            {
+                throw new ValidacaoException("OS ja concluida.");
+            }
+        }
         private async Task<OrdemServicoModel> BuscarOuFalhar(int id)
         {
             var ordemServico = await _repository.BuscarPorId(id);

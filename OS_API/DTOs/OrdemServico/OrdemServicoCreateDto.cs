@@ -6,6 +6,7 @@ namespace OS_API.DTOs.OrdemServico
 {
     public class CriarOrdemServicoDto
     {
+        
         [Required(ErrorMessage = "É obrigatório preencher o campo Título.")]
         public string TituloOs { get; set; } = string.Empty;
 
@@ -24,5 +25,7 @@ namespace OS_API.DTOs.OrdemServico
         public string? Observacao { get; set; }
 
         public List<OsFuncionarioDto> Funcionarios { get; set; } = new();
+
+        //public string IdUsuario { get; set; }
     }
 }

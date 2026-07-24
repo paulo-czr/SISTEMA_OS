@@ -39,6 +39,9 @@ namespace OS_API.Models
 
         public ICollection<OsFuncionarioModel> Funcionarios { get; set; } = new List<OsFuncionarioModel>();
 
+        public string IdUsuarioQueRegistrou { get; set; }
+        public UsuarioModel UsuarioQueRegistrou { get; set; }
+
         protected OrdemServicoModel(){}
 
         public OrdemServicoModel(
@@ -48,7 +51,8 @@ namespace OS_API.Models
             DateTime? dataHoraInicio,
             DateTime? prazo,
             string descricao,
-            string? observacao)
+            string? observacao,
+            string idUsuario)
         {
             TituloOs = tituloOs;
             IdTipoAtendimento = idTipoAtendimento;
@@ -58,6 +62,7 @@ namespace OS_API.Models
             Prazo = prazo;
             Descricao = descricao;
             Observacao = observacao;
+            IdUsuarioQueRegistrou = idUsuario;
         }
 
        

@@ -7,7 +7,7 @@ namespace OS_API.Mappings
 {
     public class OrdemServicoMapper
     {
-        public static OrdemServicoModel ParaModel(CriarOrdemServicoDto dto)
+        public static OrdemServicoModel ParaModel(CriarOrdemServicoDto dto, string idUsuario)
         {
             return new OrdemServicoModel(
                 dto.TituloOs,
@@ -16,7 +16,8 @@ namespace OS_API.Mappings
                 dto.DataHoraInicio,
                 dto.Prazo,
                 dto.Descricao,
-                dto.Observacao
+                dto.Observacao,
+                idUsuario
             );
         }
 
@@ -38,6 +39,7 @@ namespace OS_API.Mappings
                 RelatorioTecnico = model.RelatorioTecnico,
                 Observacao = model.Observacao,
                 CogigoPdf = model.CogigoPdf,
+                IdUsuarioRegistrou = model.IdUsuarioQueRegistrou,
                 Funcionarios = model.Funcionarios
                     .Select(f => new OsFuncionarioDto
                     {
@@ -58,7 +60,7 @@ namespace OS_API.Mappings
             model.DataHoraInicio = dto.DataHoraInicio;
             model.DataHoraFim = dto.DataHoraFim;
             model.Prazo = dto.Prazo;
-            model.RelatorioTecnico = dto.RelatorioTecnico;
+            //model.RelatorioTecnico = dto.RelatorioTecnico;
             model.Observacao = dto.Observacao;
         }
     }

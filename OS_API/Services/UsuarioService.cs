@@ -43,7 +43,7 @@ namespace OS_API.Services
             return await _repository.Criar(usuario, senha);
         }
 
-        public async Task<UsuarioDto?> BuscarPorId(string id)
+        public async Task<UsuarioDto> BuscarPorId(string id)
         {
             var usuario = await BuscarOuFalhar(id);
 

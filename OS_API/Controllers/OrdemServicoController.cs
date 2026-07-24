@@ -53,7 +53,6 @@ namespace OS_API.Controllers
         }
 
         // Rota separada só pra mudar o status da OS.
-        // Ex.: PATCH /api/OrdemServico/5/status
         [HttpPatch("{id}/status")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> AlterarStatus(int id, [FromBody] AlterarStatusOsDto dto)

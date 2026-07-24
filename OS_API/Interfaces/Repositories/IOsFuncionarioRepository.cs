@@ -15,6 +15,8 @@ namespace OS_API.Interfaces.Repositories
 
         Task<List<OsFuncionarioModel>> ObterPorOsAsync(int idOs);
 
+        Task<OsFuncionarioModel> BuscarPorIdOsFunc(int idOs, int idFuncionario);
+
         Task<OsFuncionarioModel?> ObterPorIdAsync(int idOsFuncionario);
 
         Task<OsFuncionarioModel> AlterarResponsavelAsync(int idOs, int idFuncionario);

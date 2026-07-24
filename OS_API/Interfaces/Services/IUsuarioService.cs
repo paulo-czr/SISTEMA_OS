@@ -11,7 +11,7 @@ namespace OS_API.Interfaces.Services
         Task AdicionarPermissaoPorTipoUsuario(UsuarioModel usuarioBanco, TipoUsuario tipoUsuario);
         Task<UsuarioModel> Criar(UsuarioModel usuario, string senha);
 
-        Task<UsuarioDto?> BuscarPorId(string id);
+        Task<UsuarioDto> BuscarPorId(string id);
 
         Task<List<UsuarioDto>> Listar();
 

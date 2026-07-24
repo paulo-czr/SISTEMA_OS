@@ -24,7 +24,7 @@ namespace OS_API.DTOs.OrdemServico
 
         public DateTime? Prazo { get; set; }
 
-        public string? RelatorioTecnico { get; set; }
+        //public string? RelatorioTecnico { get; set; }
 
         public string? Observacao { get; set; }
     }

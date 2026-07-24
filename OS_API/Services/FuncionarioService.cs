@@ -69,8 +69,6 @@ namespace OS_API.Services
                 .ToList();
         }
 
-
-
         public async Task<FuncionarioDto> Atualizar(int id, AtualizarFuncionarioDto dto)
         {
             var funcionario = await _repository.BuscarPorId(id);

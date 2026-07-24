@@ -12,6 +12,9 @@ namespace OS_API.Helpers.UsuarioLogado
 
         string? Email { get; }
 
+        string retornarUserLogado();
+        Task<int> RetornarIdFuncionarioLogado();
+
         IEnumerable<Claim> Claims { get; }
     }
 }
