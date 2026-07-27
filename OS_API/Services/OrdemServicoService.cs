@@ -8,6 +8,7 @@ using OS_API.Mappings;
 using OS_API.Migrations;
 using OS_API.Models;
 using OS_API.Models.Enum;
+using System.Data;
 using System.Security.Cryptography;
 
 namespace OS_API.Services
@@ -23,8 +24,8 @@ namespace OS_API.Services
         private readonly IUsuarioLogado _usuarioLogado;
         private readonly IUsuarioService _usuarioService;
 
-        private readonly IAssinaturaOsRepository _assinaturaRepository;   // NOVO
-        private readonly IFuncionarioService _funcionarioService;         // NOVO
+        private readonly IAssinaturaOsRepository _assinaturaRepository;  
+        private readonly IFuncionarioService _funcionarioService;        
         private readonly IHttpContextAccessor _httpContextAccessor;
 
 
@@ -37,8 +38,8 @@ namespace OS_API.Services
             IUsuarioLogado usuarioLogado,
             IUsuarioService usuarioService,
             IOsFuncionarioService osFuncionarioService,
-            IAssinaturaOsRepository assinaturaRepository,   // NOVO
-            IFuncionarioService funcionarioService,          // NOVO
+            IAssinaturaOsRepository assinaturaRepository,   
+            IFuncionarioService funcionarioService,         
             IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
@@ -72,6 +73,9 @@ namespace OS_API.Services
             {
                 throw new EntidadeNaoEncontradaException("Um funcionário não pode ser informado mais de uma vez.");
             }
+
+            //validar datas 
+            FalharDatasInvalidas(dto.Prazo, dto.DataHoraInicio);
 
             //pegar o usuario que registrou
             var idUsuario = _usuarioLogado.retornarUserLogado();
@@ -120,6 +124,9 @@ namespace OS_API.Services
             var cliente = await _clienteService.BuscarClienteOuFalhar(dto.IdCliente);
             // Validar se o Tipo de Atendimento informado existe.
             var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdTipoAtendimento);
+
+            //validar datas 
+            FalharDatasInvalidas(dto.Prazo, dto.DataHoraInicio);
 
             // não atualizar se tiver concluida
             falharSeOSConcluida(ordemServico);
@@ -175,10 +182,9 @@ namespace OS_API.Services
             // Validar a transição de status 
             falharSeOSConcluida(ordemServico);
 
-            if (dto.Status == StatusOs.EmAtendimento && ordemServico.DataHoraInicio == null)
-            {
-                ordemServico.DataHoraInicio = DateTime.UtcNow;
-            }
+
+            ordemServico.DataHoraInicio = DateTime.UtcNow;
+
 
             ordemServico.Status = dto.Status;
             await _repository.Atualizar(ordemServico);
@@ -305,6 +311,7 @@ namespace OS_API.Services
 
             return new AssinaturaPublicaDto
             {
+                IdOs = ordemServico.IdOs,
                 TituloOs = ordemServico.TituloOs,
                 NomeCliente = ordemServico.Cliente.NomeFantasia,
                 DocumentoCliente = ordemServico.Cliente.Documento,
@@ -314,7 +321,8 @@ namespace OS_API.Services
                 RelatorioTecnico = ordemServico.RelatorioTecnico,
                 NomeFuncionario = assinaturaFuncionario?.NomeSignatario ?? string.Empty,
                 AssinaturaFuncionarioBase64 = assinaturaFuncionario?.ImagemAssinatura ?? string.Empty,
-                JaAssinadoPeloCliente = assinaturaCliente != null
+                JaAssinadoPeloCliente = assinaturaCliente != null,
+                NomeTipoAtendimento = ordemServico.TipoAtendimento.Descricao
             };
         }
 
@@ -374,6 +382,25 @@ namespace OS_API.Services
         {
             var ordemServico = await BuscarOuFalhar(id);
             return ordemServico.ArquivoPdf;
+        }
+
+        //data prazo menor
+        private void FalharDatasInvalidas(DateTime? prazo, DateTime? inicio)
+        {
+            if (prazo.HasValue && prazo.Value.Date < DateTime.Today)
+            {
+                throw new ValidacaoException("O prazo não pode ser anterior à data de hoje.");
+            }
+
+            if (inicio.HasValue && inicio.Value.Date < DateTime.Today)
+            {
+                throw new ValidacaoException("A data de início não pode ser anterior à data de hoje.");
+            }
+
+            if (prazo.HasValue && inicio.HasValue && inicio.Value > prazo.Value)
+            {
+                throw new ValidacaoException("A data de início não pode ser maior que a data do prazo.");
+            }
         }
     }
 }

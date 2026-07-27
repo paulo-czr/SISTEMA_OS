@@ -84,9 +84,13 @@ namespace OS_API.Models
                 if (Prazo.HasValue && Prazo.Value.Date < DateTime.Today)
                     return StatusOs.Atrasada;
 
-                if (DataHoraInicio.HasValue)
+                if (DataHoraInicio.HasValue && DataHoraInicio.Value.Date <= DateTime.Today)
+                {
                     return StatusOs.EmAtendimento;
-
+                } else if(DataHoraInicio.HasValue && DataHoraInicio.Value.Date > DateTime.Today)
+                {
+                    return StatusOs.Agendada;
+                }
                 return Status;
             }
         }

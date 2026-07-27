@@ -53,7 +53,6 @@ namespace OS_API.Services
                 throw new EntidadeNaoEncontradaException("Vínculo entre OS e funcionário não encontrado.");
 
             // Não deixa remover o responsável se ele for o único funcionário vinculado à OS
-            // (assim a OS nunca fica sem ninguém responsável).
             if (vinculo.Responsavel)
             {
                 var vinculosDaOs = await _repository.ObterPorOsAsync(vinculo.IdOs);

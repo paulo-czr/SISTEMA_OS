@@ -71,7 +71,7 @@ namespace OS_API.Services
         {
             var tipoAtendimento = await BuscarOuFalhar(id);
 
-            // Se um dia precisar impedir a remoção de um tipo já usado em alguma OS, validar aqui.
+            // validar se tem os vinculada
 
             await _repository.Remover(tipoAtendimento);
         }

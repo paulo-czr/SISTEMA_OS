@@ -25,6 +25,7 @@ namespace OS_API.Helpers.Constantes
                 Permissoes.UsuarioAtualizar,
                 Permissoes.UsuarioRemover,
                 Permissoes.UsuarioGerenciarPermissoes,
+                Permissoes.UsuarioVisualizar,
                 // Tipo de Atendimento
                 Permissoes.TipoAtendimentoCriar,
                 Permissoes.TipoAtendimentoAtualizar
@@ -32,13 +33,39 @@ namespace OS_API.Helpers.Constantes
                 TipoUsuario.Gestor => new()
             {
                 Permissoes.FuncionarioVisualizar,
+                Permissoes.FuncionarioCriar,
+                Permissoes. FuncionarioAtualizar,
+                // Cliente
                 Permissoes.ClienteCriar,
-                Permissoes.ClienteAtualizar
+                Permissoes.ClienteAtualizar,
+                // Ordem de Serviço
+                Permissoes.OSCriar,
+                Permissoes.OSAtualizar,
+                // Usuário
+                Permissoes.UsuarioVisualizar,
+                Permissoes.UsuarioAtualizar,
+                Permissoes.UsuarioRemover,
+                Permissoes.UsuarioGerenciarPermissoes,
+                Permissoes.UsuarioVisualizar,
+                // Tipo de Atendimento
+                Permissoes.TipoAtendimentoCriar,
+                Permissoes.TipoAtendimentoAtualizar,
+
+
             },
                 TipoUsuario.Tecnico => new()
             {
                 Permissoes.FuncionarioVisualizar,
-                Permissoes.ClienteCriar
+
+                // Cliente
+                Permissoes.ClienteCriar,
+                Permissoes.ClienteAtualizar,
+
+                Permissoes.OSCriar,
+                Permissoes.OSAtualizar,
+                // Tipo de Atendimento
+                Permissoes.TipoAtendimentoCriar,
+                Permissoes.TipoAtendimentoAtualizar
             },
                 _ => new()
             };
