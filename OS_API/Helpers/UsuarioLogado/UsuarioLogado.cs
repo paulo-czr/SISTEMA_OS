@@ -1,4 +1,5 @@
-﻿using OS_API.Interfaces.Services;
+﻿using OS_API.Exceptionn;
+using OS_API.Interfaces.Services;
 using System.Security.Claims;
 
 namespace OS_API.Helpers.UsuarioLogado
@@ -43,7 +44,14 @@ namespace OS_API.Helpers.UsuarioLogado
         public async Task<int> RetornarIdFuncionarioLogado()
         {
             var usuario = await _usuarioService.BuscarPorId(retornarUserLogado());
-            return (int)usuario.IdFuncionario!;
+
+            if (usuario == null)
+                throw new EntidadeNaoEncontradaException("Usuário não encontrado.");
+
+            if (usuario.IdFuncionario == null)
+                throw new Exception("O usuário logado não possui um funcionário vinculado.");
+
+            return usuario.IdFuncionario.Value;
         }
 
 

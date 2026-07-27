@@ -13,5 +13,7 @@
         public string Email { get; set; } = string.Empty;
 
         public bool Ativo { get; set; }
+
+        public string? AssinaturaPadrao { get; set; }
     }
 }

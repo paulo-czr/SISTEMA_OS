@@ -1,4 +1,5 @@
-﻿using OS_API.DTOs.OSFuncionario;
+﻿using Microsoft.AspNetCore.Http.Connections;
+using OS_API.DTOs.OSFuncionario;
 using OS_API.Exceptionn;
 using OS_API.Interfaces.Repositories;
 using OS_API.Interfaces.Services;
@@ -23,6 +24,16 @@ namespace OS_API.Services
 
             if (vinculosDaOs.Any(v => v.IdFuncionario == idFuncionario))
                 throw new ConflitoException("Esse funcionário já está vinculado a essa OS.");
+
+            //validar se ja tem resposavel e se esta mandando como responsavel
+            if (responsavel)
+            {
+                var funcionarioRespon = await _repository.BuscarFuncionarioResponsavel(idOs);
+                if (funcionarioRespon != null)
+                {
+                    throw new ValidacaoException("Já existe um funcionario responsavel na OS.");
+                }
+            }
 
             var osFuncionario = new OsFuncionarioModel
             {
@@ -88,7 +99,7 @@ namespace OS_API.Services
         {
             var osFunc = await _repository.BuscarPorIdOsFunc(idOs, idFuncionario);
 
-            if (osFunc.Responsavel)
+            if ((osFunc != null) && (osFunc.Responsavel))
             {
                 return true;
             }

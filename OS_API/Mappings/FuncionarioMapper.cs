@@ -22,7 +22,8 @@ namespace OS_API.Mappings
                 UsuarioId = model.UsuarioId,
                 UserName = model.Usuario?.UserName ?? string.Empty,
                 Email = model.Usuario?.Email ?? string.Empty,
-                Ativo = model.Usuario?.Ativo ?? false
+                Ativo = model.Usuario?.Ativo ?? false,
+                AssinaturaPadrao = model.AssinaturaPadrao
             };
         }
     }

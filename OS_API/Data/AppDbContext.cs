@@ -22,8 +22,8 @@ namespace OS_API.Data
         public DbSet<ClienteModel> Clientes { get; set; }
         public DbSet<OrdemServicoModel> OrdensServico { get; set; }
         public DbSet<OsFuncionarioModel> OsFuncionarios { get; set; }
-        
 
+        public DbSet<AssinaturaOsModel> Assinaturas { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

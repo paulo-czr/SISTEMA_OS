@@ -118,6 +118,17 @@ namespace OS_API.Services
             }
            
         }
+
+        public async Task AtualizarAssinaturaPadrao(int id, string imagemAssinatura)
+        {
+            var funcionario = await _repository.BuscarPorId(id);
+
+            if (funcionario == null)
+                throw new EntidadeNaoEncontradaException("Funcionário não encontrado.");
+
+            funcionario.AtualizarAssinaturaPadrao(imagemAssinatura);
+            await _repository.Atualizar(funcionario);
+        }
     }
 
 }

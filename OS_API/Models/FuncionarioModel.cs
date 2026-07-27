@@ -10,6 +10,9 @@
 
         public UsuarioModel Usuario { get; set; }
 
+        // Assinatura desenhada uma vez e reaproveitada nos próximos relatórios,
+        // sem precisar assinar de novo toda hora (base64, PNG).
+        public string? AssinaturaPadrao { get; private set; }
 
         protected FuncionarioModel() { }
 
@@ -25,5 +28,11 @@
         {
             Nome = nome;
         }
+
+        public void AtualizarAssinaturaPadrao(string imagemAssinatura)
+        {
+            AssinaturaPadrao = imagemAssinatura;
+        }
     }
 }
+

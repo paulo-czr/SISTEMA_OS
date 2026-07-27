@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OS_API.DTOs.Assinatura;
 using OS_API.DTOs.OrdemServico;
 using OS_API.DTOs.OSFuncionario;
+using OS_API.Exceptionn;
 using OS_API.Helpers.Constantes;
 using OS_API.Interfaces.Services;
 
@@ -43,7 +45,6 @@ namespace OS_API.Controllers
         }
 
         // Rota separada só pro funcionário preencher/editar o relatório dele.
-        // Ex.: PATCH /api/OrdemServico/5/relatorio
         [HttpPatch("{id}/relatorio")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> AtualizarRelatorio(int id, [FromBody] AtualizarRelatorioDto dto)
@@ -82,12 +83,10 @@ namespace OS_API.Controllers
             return NoContent();
         }
 
-        // ---- Funcionários vinculados à OS (OsFuncionario) ----
-        // Fica aqui dentro do OrdemServicoController porque um vínculo
-        // OS-Funcionário não existe sozinho, sempre pertence a uma OS.
+
 
         // Lista os funcionários vinculados a uma OS.
-        // Ex.: GET /api/OrdemServico/5/funcionarios
+        // GET /api/OrdemServico/5/funcionarios
         [HttpGet("{idOs}/funcionarios")]
         public async Task<IActionResult> ListarFuncionarios(int idOs)
         {
@@ -123,6 +122,50 @@ namespace OS_API.Controllers
         {
             await _osFuncionarioService.DefinirResponsavelAsync(idOs, idFuncionario);
             return NoContent();
+        }
+
+
+        //-----------------------------------------
+        // Funcionário responsável assina e gera o link/token de assinatura pro cliente.
+        // POST /api/OrdemServico/5/relatorio/iniciar-assinatura
+        [HttpPost("{id}/relatorio/iniciar-assinatura")]
+        [Authorize(Policy = Permissoes.OSAtualizar)]
+        public async Task<IActionResult> IniciarAssinatura(int id, [FromBody] IniciarAssinaturaDto dto)
+        {
+            var resultado = await _service.IniciarAssinatura(id, dto);
+            return Ok(resultado);
+        }
+
+        // Página PÚBLICA de assinatura — o cliente abre isso pelo link/QR code, sem estar logado.
+        // GET /api/OrdemServico/assinatura/{token}
+        [HttpGet("assinatura/{token}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> BuscarAssinaturaPublica(string token)
+        {
+            var dados = await _service.BuscarAssinaturaPublica(token);
+            return Ok(dados);
+        }
+
+        // Cliente confirma a assinatura dele (também pública, sem login).
+        // POST /api/OrdemServico/assinatura/{token}
+        [HttpPost("assinatura/{token}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SubmeterAssinaturaCliente(string token, [FromBody] SubmeterAssinaturaClienteDto dto)
+        {
+            await _service.SubmeterAssinaturaCliente(token, dto);
+            return NoContent();
+        }
+
+        // GET /api/OrdemServico/5/pdf — baixa o PDF assinado (binário, não JSON)
+        [HttpGet("{id}/pdf")]
+        [Authorize]
+        public async Task<IActionResult> ObterPdf(int id)
+        {
+            var bytes = await _service.ObterPdf(id);
+            if (bytes == null || bytes.Length == 0)
+                throw new EntidadeNaoEncontradaException("Esta OS ainda não tem um relatório assinado.");
+
+            return File(bytes, "application/pdf", $"os-{id}.pdf");
         }
     }
 }

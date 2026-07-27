@@ -1,4 +1,5 @@
-﻿using OS_API.DTOs.OrdemServico;
+﻿using OS_API.DTOs.Assinatura;
+using OS_API.DTOs.OrdemServico;
 using OS_API.Exceptionn;
 using OS_API.Helpers.UsuarioLogado;
 using OS_API.Interfaces.Repositories;
@@ -7,6 +8,7 @@ using OS_API.Mappings;
 using OS_API.Migrations;
 using OS_API.Models;
 using OS_API.Models.Enum;
+using System.Security.Cryptography;
 
 namespace OS_API.Services
 {
@@ -20,7 +22,11 @@ namespace OS_API.Services
         private readonly ITipoAtendimentoService _TipoAtendimento;
         private readonly IUsuarioLogado _usuarioLogado;
         private readonly IUsuarioService _usuarioService;
-        
+
+        private readonly IAssinaturaOsRepository _assinaturaRepository;   // NOVO
+        private readonly IFuncionarioService _funcionarioService;         // NOVO
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
 
         public OrdemServicoService(
             IOrdemServicoRepository repository,
@@ -30,7 +36,10 @@ namespace OS_API.Services
             ITipoAtendimentoService tipoAtendimento,
             IUsuarioLogado usuarioLogado,
             IUsuarioService usuarioService,
-            IOsFuncionarioService osFuncionarioService)
+            IOsFuncionarioService osFuncionarioService,
+            IAssinaturaOsRepository assinaturaRepository,   // NOVO
+            IFuncionarioService funcionarioService,          // NOVO
+            IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _unidadeTrabalho = unidadeTrabalho;
@@ -39,6 +48,9 @@ namespace OS_API.Services
             _usuarioLogado = usuarioLogado;
             _osFuncionarioService = osFuncionarioService;
             _osFuncionarioRepository = osFuncionarioRepository;
+            _assinaturaRepository = assinaturaRepository;
+            _funcionarioService = funcionarioService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BuscarOrdemServicoDto> Criar(CriarOrdemServicoDto dto)
@@ -47,7 +59,7 @@ namespace OS_API.Services
             var cliente = await _clienteService.BuscarClienteOuFalhar(dto.IdCliente);
 
             // Validar se o Tipo de Atendimento informado existe.
-            var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdCliente);
+            var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdTipoAtendimento);
 
 
             // Validar se existe apenas um funcionário marcado como responsável em dto.Funcionarios.
@@ -107,7 +119,7 @@ namespace OS_API.Services
             // Validar se o Cliente informado existe.
             var cliente = await _clienteService.BuscarClienteOuFalhar(dto.IdCliente);
             // Validar se o Tipo de Atendimento informado existe.
-            var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdCliente);
+            var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdTipoAtendimento);
 
             // não atualizar se tiver concluida
             falharSeOSConcluida(ordemServico);
@@ -145,8 +157,9 @@ namespace OS_API.Services
             //validar se o funcionario está na OS e é o responsavel
             if(!await _osFuncionarioService.VerificarTecnicoEResponsavelAsync(ordemServico.IdOs, idFuncionario))
             {
-                throw new ValidacaoException("Somente o funcionario pode inserir o relatorio.");
+                throw new ValidacaoException("Somente o funcionario responsavel pode inserir o relatorio.");
             }
+
             ordemServico.RelatorioTecnico = dto.RelatorioTecnico;
 
             await _repository.Atualizar(ordemServico);
@@ -161,19 +174,22 @@ namespace OS_API.Services
 
             // Validar a transição de status 
             falharSeOSConcluida(ordemServico);
+
+            if (dto.Status == StatusOs.EmAtendimento && ordemServico.DataHoraInicio == null)
+            {
+                ordemServico.DataHoraInicio = DateTime.UtcNow;
+            }
+
             ordemServico.Status = dto.Status;
-
             await _repository.Atualizar(ordemServico);
-
             return OrdemServicoMapper.ParaDto(ordemServico);
         }
 
         public async Task Remover(int id)
         {
             var ordemServico = await BuscarOuFalhar(id);
-
             // Validar se a OS pode ser removida (ex.: não permitir remoção de OS já concluída).
-
+            falharSeOSConcluida(ordemServico);
             await _repository.Remover(ordemServico);
         }
 
@@ -192,6 +208,172 @@ namespace OS_API.Services
                 throw new EntidadeNaoEncontradaException("Ordem de Serviço não encontrada.");
 
             return ordemServico;
+        }
+
+        //-----------------------------------------------------------
+        // Funcionário responsável assina e gera o link/token de assinatura pro cliente.
+        public async Task<TokenAssinaturaDto> IniciarAssinatura(int id, IniciarAssinaturaDto dto)
+        {
+
+            var ordemServico = await BuscarOuFalhar(id);
+            falharSeOSConcluida(ordemServico);
+
+            if (ordemServico.DataHoraFim == null)
+            {
+                ordemServico.DataHoraFim = DateTime.UtcNow;
+            }
+
+            int idFuncionario = await _usuarioLogado.RetornarIdFuncionarioLogado();
+
+            if (!await _osFuncionarioService.VerificarTecnicoEResponsavelAsync(ordemServico.IdOs, idFuncionario))
+            {
+                throw new ValidacaoException("Somente o funcionário responsável pode gerar o relatório.");
+            }
+
+            var funcionario = await _funcionarioService.BuscarPorId(idFuncionario);
+            if (funcionario == null)
+            {
+                throw new EntidadeNaoEncontradaException("Funcionário não encontrado.");
+            }
+
+            if (string.IsNullOrWhiteSpace(ordemServico.RelatorioTecnico))
+            {
+                throw new ValidacaoException("Preencha o relatório técnico antes de gerar o relatório assinado.");
+            }
+
+            var http = _httpContextAccessor.HttpContext;
+            var ip = http?.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+            var userAgent = http?.Request.Headers["User-Agent"].ToString() ?? string.Empty;
+
+            // Substitui a assinatura do funcionário já registrada nessa OS, se houver
+            // (permite assinar de novo, trocando a que tinha sido usada antes).
+            var assinaturaFuncionario = await _assinaturaRepository.BuscarPorOsETipo(id, TipoSignatario.Funcionario);
+            if (assinaturaFuncionario != null)
+            {
+                assinaturaFuncionario.ImagemAssinatura = dto.ImagemAssinaturaFuncionario;
+                assinaturaFuncionario.DataAssinatura = DateTime.UtcNow;
+                assinaturaFuncionario.Ip = ip;
+                assinaturaFuncionario.UserAgente = userAgent;
+                await _assinaturaRepository.Atualizar(assinaturaFuncionario);
+            }
+            else
+            {
+                await _assinaturaRepository.Adicionar(new AssinaturaOsModel
+                {
+                    IdOs = id,
+                    Tipo = TipoSignatario.Funcionario,
+                    NomeSignatario = funcionario.Nome,
+                    ImagemAssinatura = dto.ImagemAssinaturaFuncionario,
+                    DataAssinatura = DateTime.UtcNow,
+                    Ip = ip,
+                    UserAgente = userAgent
+                });
+            }
+
+            // Se pedido, essa assinatura também vira a assinatura padrão do funcionário.
+            if (dto.SalvarComoPadrao)
+            {
+                await _funcionarioService.AtualizarAssinaturaPadrao(idFuncionario, dto.ImagemAssinaturaFuncionario);
+            }
+
+            // Token opaco de 24h — 24 é fixo aqui por decisão explícita do produto;
+            // se precisar virar configurável, isso vira um parâmetro do método.
+            var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(24));
+            ordemServico.TokenAssinaturaCliente = token;
+            ordemServico.TokenAssinaturaExpiraEm = DateTime.UtcNow.AddHours(24);
+            await _repository.Atualizar(ordemServico);
+
+            return new TokenAssinaturaDto
+            {
+                Token = token,
+                ExpiraEm = ordemServico.TokenAssinaturaExpiraEm.Value
+            };
+        }
+
+        // Dados públicos (sem login) pra tela que o cliente abre pelo link/QR code.
+        public async Task<AssinaturaPublicaDto> BuscarAssinaturaPublica(string token)
+        {
+            var ordemServico = await _repository.BuscarPorToken(token);
+            if (ordemServico == null)
+                throw new EntidadeNaoEncontradaException("Link de assinatura inválido. Verifique com o consultor se a assinatura ja está salva.");
+
+            if (ordemServico.TokenAssinaturaExpiraEm == null || ordemServico.TokenAssinaturaExpiraEm < DateTime.UtcNow)
+                throw new ValidacaoException("Este link de assinatura expirou. Peça pro responsável gerar um novo.");
+
+            var assinaturaFuncionario = await _assinaturaRepository.BuscarPorOsETipo(ordemServico.IdOs, TipoSignatario.Funcionario);
+            var assinaturaCliente = await _assinaturaRepository.BuscarPorOsETipo(ordemServico.IdOs, TipoSignatario.Cliente);
+
+            return new AssinaturaPublicaDto
+            {
+                TituloOs = ordemServico.TituloOs,
+                NomeCliente = ordemServico.Cliente.NomeFantasia,
+                DocumentoCliente = ordemServico.Cliente.Documento,
+                DataHoraInicio = ordemServico.DataHoraInicio,
+                DataHoraFim = ordemServico.DataHoraFim,
+                Descricao = ordemServico.Descricao,
+                RelatorioTecnico = ordemServico.RelatorioTecnico,
+                NomeFuncionario = assinaturaFuncionario?.NomeSignatario ?? string.Empty,
+                AssinaturaFuncionarioBase64 = assinaturaFuncionario?.ImagemAssinatura ?? string.Empty,
+                JaAssinadoPeloCliente = assinaturaCliente != null
+            };
+        }
+
+        // Cliente confirma a assinatura dele: salva a assinatura + o PDF final, e invalida o token.
+        public async Task SubmeterAssinaturaCliente(string token, SubmeterAssinaturaClienteDto dto)
+        {
+            try
+            {
+                await _unidadeTrabalho.IniciarTransacaoAsync();
+                var ordemServico = await _repository.BuscarPorToken(token);
+                if (ordemServico == null)
+                    throw new EntidadeNaoEncontradaException("Link de assinatura inválido.");
+
+                if (ordemServico.TokenAssinaturaExpiraEm == null || ordemServico.TokenAssinaturaExpiraEm < DateTime.UtcNow)
+                    throw new ValidacaoException("Este link de assinatura expirou. Peça pro responsável gerar um novo.");
+
+                var assinaturaClienteExistente = await _assinaturaRepository.BuscarPorOsETipo(ordemServico.IdOs, TipoSignatario.Cliente);
+                if (assinaturaClienteExistente != null)
+                    throw new ConflitoException("Esta Ordem de Serviço já foi assinada pelo cliente.");
+
+                var http = _httpContextAccessor.HttpContext;
+
+                await _assinaturaRepository.Adicionar(new AssinaturaOsModel
+                {
+                    IdOs = ordemServico.IdOs,
+                    Tipo = TipoSignatario.Cliente,
+                    NomeSignatario = dto.NomeSignatario,
+                    DocumentoSignatario = dto.DocumentoSignatario ?? string.Empty,
+                    ImagemAssinatura = dto.ImagemAssinatura,
+                    DataAssinatura = DateTime.UtcNow,
+                    Ip = http?.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
+                    UserAgente = http?.Request.Headers["User-Agent"].ToString() ?? string.Empty
+                });
+
+                ordemServico.ArquivoPdf = dto.ArquivoPdf;
+                ordemServico.TokenAssinaturaCliente = null;  // invalida o token: não dá pra reusar o link
+                ordemServico.TokenAssinaturaExpiraEm = null;
+
+                // Cliente assinou -> conclui a OS automaticamente, sem precisar do botão manual.
+                ordemServico.Status = StatusOs.Concluida;
+
+                await _repository.Atualizar(ordemServico);
+
+                await _unidadeTrabalho.ConfirmarTransacaoAsync();
+
+            }
+            catch (Exception e)
+            {
+                await _unidadeTrabalho.DesfazerTransacaoAsync();
+                throw;
+            }
+           
+        }
+
+        // Devolve o PDF assinado (ou null se ainda não foi gerado).
+        public async Task<byte[]?> ObterPdf(int id)
+        {
+            var ordemServico = await BuscarOuFalhar(id);
+            return ordemServico.ArquivoPdf;
         }
     }
 }

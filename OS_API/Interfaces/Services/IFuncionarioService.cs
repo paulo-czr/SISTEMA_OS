@@ -13,5 +13,8 @@ namespace OS_API.Interfaces.Services
         Task<FuncionarioDto> Atualizar(int id, AtualizarFuncionarioDto dto);
 
         Task Remover(int id);
+
+        //salva/troca a assinatura padrão do funcionário informado.
+        Task AtualizarAssinaturaPadrao(int id, string imagemAssinatura);
     }
 }

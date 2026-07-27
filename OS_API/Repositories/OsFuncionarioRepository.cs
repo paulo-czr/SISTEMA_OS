@@ -71,5 +71,12 @@ namespace OS_API.Repositories
                 .FirstOrDefaultAsync(x => x.IdOs == idOs &&
                                           x.IdFuncionario == idFuncionario);
         }
+
+        public async Task<OsFuncionarioModel?> BuscarFuncionarioResponsavel(int idOs)
+        {
+            return await _context.OsFuncionarios
+                .Include(x => x.funcionario)
+                .FirstOrDefaultAsync(x => x.IdOs == idOs && x.Responsavel);
+        }
     }
 }

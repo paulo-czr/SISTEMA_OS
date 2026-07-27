@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OS_API.Data;
@@ -11,9 +12,11 @@ using OS_API.Data;
 namespace OS_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260724235822_usuarioRegistrou")]
+    partial class usuarioRegistrou
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,8 +170,7 @@ namespace OS_API.Migrations
 
                     b.Property<string>("DocumentoSignatario")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<int>("IdOs")
                         .HasColumnType("integer");
@@ -179,32 +181,24 @@ namespace OS_API.Migrations
 
                     b.Property<string>("Ip")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("NomeSignatario")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasColumnType("text");
 
-                    b.Property<int?>("OrdemServicoModelIdOs")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Tipo")
+                    b.Property<int>("OrdemServicoIdOs")
                         .HasColumnType("integer");
 
                     b.Property<string>("UserAgente")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdOs");
+                    b.HasIndex("OrdemServicoIdOs");
 
-                    b.HasIndex("OrdemServicoModelIdOs");
-
-                    b.ToTable("Assinaturas", (string)null);
+                    b.ToTable("AssinaturaOsModel");
                 });
 
             modelBuilder.Entity("OS_API.Models.Cliente.ClienteModel", b =>
@@ -280,9 +274,6 @@ namespace OS_API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AssinaturaPadrao")
-                        .HasColumnType("text");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -352,12 +343,6 @@ namespace OS_API.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
-
-                    b.Property<string>("TokenAssinaturaCliente")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("TokenAssinaturaExpiraEm")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("IdOs");
 
@@ -565,14 +550,10 @@ namespace OS_API.Migrations
             modelBuilder.Entity("OS_API.Models.AssinaturaOsModel", b =>
                 {
                     b.HasOne("OS_API.Models.OrdemServicoModel", "OrdemServico")
-                        .WithMany("Assinaturas")
-                        .HasForeignKey("IdOs")
+                        .WithMany("Assinatura")
+                        .HasForeignKey("OrdemServicoIdOs")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("OS_API.Models.OrdemServicoModel", null)
-                        .WithMany("Assinatura")
-                        .HasForeignKey("OrdemServicoModelIdOs");
 
                     b.Navigation("OrdemServico");
                 });
@@ -637,8 +618,6 @@ namespace OS_API.Migrations
             modelBuilder.Entity("OS_API.Models.OrdemServicoModel", b =>
                 {
                     b.Navigation("Assinatura");
-
-                    b.Navigation("Assinaturas");
 
                     b.Navigation("Funcionarios");
                 });

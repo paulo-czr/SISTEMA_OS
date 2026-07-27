@@ -36,6 +36,8 @@ namespace OS_API.DTOs.OrdemServico
 
         public string CogigoPdf { get; set; } = string.Empty;
 
+        public bool PossuiPdfAssinado { get; set; }
+
         public List<OsFuncionarioDto> Funcionarios { get; set; } = new();
     }
 

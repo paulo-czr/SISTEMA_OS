@@ -1,5 +1,6 @@
 ﻿using OS_API.Models.Cliente;
 using OS_API.Models.Enum;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OS_API.Models
 {
@@ -42,6 +43,13 @@ namespace OS_API.Models
         public string IdUsuarioQueRegistrou { get; set; }
         public UsuarioModel UsuarioQueRegistrou { get; set; }
 
+        public string? TokenAssinaturaCliente { get; set; }
+
+        public DateTime? TokenAssinaturaExpiraEm { get; set; }
+
+        public ICollection<AssinaturaOsModel> Assinaturas { get; set; }
+    = new List<AssinaturaOsModel>();
+
         protected OrdemServicoModel(){}
 
         public OrdemServicoModel(
@@ -65,6 +73,23 @@ namespace OS_API.Models
             IdUsuarioQueRegistrou = idUsuario;
         }
 
-       
+        [NotMapped]
+        public StatusOs StatusAtual
+        {
+            get
+            {
+                if (Status == StatusOs.Concluida)
+                    return StatusOs.Concluida;
+
+                if (Prazo.HasValue && Prazo.Value.Date < DateTime.Today)
+                    return StatusOs.Atrasada;
+
+                if (DataHoraInicio.HasValue)
+                    return StatusOs.EmAtendimento;
+
+                return Status;
+            }
+        }
+
     }
 }

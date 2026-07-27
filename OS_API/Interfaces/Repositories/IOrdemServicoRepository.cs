@@ -12,6 +12,8 @@ namespace OS_API.Interfaces.Repositories
 
         Task Atualizar(OrdemServicoModel ordemServico);
 
+        Task<OrdemServicoModel?> BuscarPorToken(string token);
+
         Task Remover(OrdemServicoModel ordemServico);
     }
 }

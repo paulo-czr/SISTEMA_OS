@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OS_API.DTOs.Funcionario;
 using OS_API.DTOs.Tecnico;
 using OS_API.Helpers.Constantes;
+using OS_API.Helpers.UsuarioLogado;
 using OS_API.Interfaces.Repositories;
 using OS_API.Interfaces.Services;
 
@@ -15,10 +17,16 @@ namespace OS_API.Controllers
 
         private readonly IFuncionarioRepository _repository;
         private readonly IFuncionarioService _service;
-        public FuncionarioController(IFuncionarioRepository repository, IFuncionarioService service)
+        private readonly IUsuarioLogado _usuarioLogado;
+
+        public FuncionarioController(
+            IFuncionarioRepository repository,
+            IFuncionarioService service,
+            IUsuarioLogado usuarioLogado)
         {
             _repository = repository;
             _service = service;
+            _usuarioLogado = usuarioLogado;
         }
 
 
@@ -61,6 +69,18 @@ namespace OS_API.Controllers
         public async Task<IActionResult> Remover(int id)
         {
             await _service.Remover(id);
+            return NoContent();
+        }
+
+        // NOVO: o próprio funcionário logado salva/troca a assinatura padrão dele.
+        // Não recebe id na rota de propósito — sempre é a do usuário autenticado,
+        // pra ninguém conseguir trocar a assinatura de outra pessoa.
+        [HttpPut("assinatura")]
+        [Authorize]
+        public async Task<IActionResult> AtualizarMinhaAssinatura([FromBody] AtualizarAssinaturaFuncionarioDto dto)
+        {
+            var idFuncionario = await _usuarioLogado.RetornarIdFuncionarioLogado();
+            await _service.AtualizarAssinaturaPadrao(idFuncionario, dto.ImagemAssinatura);
             return NoContent();
         }
     }

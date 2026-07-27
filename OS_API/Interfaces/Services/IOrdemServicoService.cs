@@ -1,4 +1,5 @@
-﻿using OS_API.DTOs.OrdemServico;
+﻿using OS_API.DTOs.Assinatura;
+using OS_API.DTOs.OrdemServico;
 
 namespace OS_API.Interfaces.Services
 {
@@ -20,5 +21,16 @@ namespace OS_API.Interfaces.Services
         Task<BuscarOrdemServicoDto> AlterarStatus(int id, AlterarStatusOsDto dto);
 
         Task Remover(int id);
+
+        // NOVO: funcionário responsável assina e gera o link/token de assinatura pro cliente.
+        Task<TokenAssinaturaDto> IniciarAssinatura(int id, IniciarAssinaturaDto dto);
+
+        // NOVO: dados públicos (sem login) pra tela de assinatura que o cliente abre pelo link.
+        Task<AssinaturaPublicaDto> BuscarAssinaturaPublica(string token);
+
+        // NOVO: cliente confirma a assinatura dele e o PDF final é salvo.
+        Task SubmeterAssinaturaCliente(string token, SubmeterAssinaturaClienteDto dto);
+
+        Task<byte[]?> ObterPdf(int id);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace OS_API.Models
+﻿using OS_API.Models.Enum;
+
+namespace OS_API.Models
 {
     public class AssinaturaOsModel
     {
@@ -19,6 +21,8 @@
         public string Ip { get; set; } = string.Empty;
 
         public string UserAgente { get; set; } = string.Empty;
+
+        public TipoSignatario Tipo { get; set; }
 
     }
 }

@@ -32,7 +32,7 @@ namespace OS_API.Mappings
                 NomeTipoAtendimento = model.TipoAtendimento.Descricao,
                 IdCliente = model.IdCliente,
                 NomeCliente = model.Cliente.NomeFantasia,
-                Status = model.Status,
+                Status = model.StatusAtual,
                 DataHoraInicio = model.DataHoraInicio,
                 DataHoraFim = model.DataHoraFim,
                 Prazo = model.Prazo,
@@ -46,7 +46,8 @@ namespace OS_API.Mappings
                         IdFuncionario = f.IdFuncionario,
                         Responsavel = f.Responsavel
                     })
-                    .ToList()
+                    .ToList(),
+                PossuiPdfAssinado = model.ArquivoPdf != null && model.ArquivoPdf.Length > 0
             };
         }
 
@@ -56,7 +57,7 @@ namespace OS_API.Mappings
             model.Descricao = dto.Descricao;
             model.IdTipoAtendimento = dto.IdTipoAtendimento;
             model.IdCliente = dto.IdCliente;
-            model.Status = dto.Status;
+            //model.Status = dto.Status;
             model.DataHoraInicio = dto.DataHoraInicio;
             model.DataHoraFim = dto.DataHoraFim;
             model.Prazo = dto.Prazo;

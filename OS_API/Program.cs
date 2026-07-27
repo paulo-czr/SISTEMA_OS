@@ -86,6 +86,7 @@ builder.Services.AddScoped<IOrdemServicoRepository, OrdemServicoRepository>();
 builder.Services.AddScoped<IOrdemServicoService, OrdemServicoService>();
 builder.Services.AddScoped<ITipoAtendimentoRepository, TipoAtendimentoRepository>();
 builder.Services.AddScoped<ITipoAtendimentoService, TipoAtendimentoService>();
+builder.Services.AddScoped<IAssinaturaOsRepository, AssinaturaOsRepository>();
 
 // Cliente + integracao com o ViaCEP
 builder.Services.AddScoped<IClienteService, ClienteService>();

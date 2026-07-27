@@ -57,5 +57,15 @@ namespace OS_API.Repositories
             _context.OrdensServico.Remove(ordemServico);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<OrdemServicoModel?> BuscarPorToken(string token)
+        {
+            return await _context.OrdensServico
+                .Include(o => o.Cliente)
+                .Include(o => o.TipoAtendimento)
+                .Include(o => o.Funcionarios)
+                    .ThenInclude(f => f.funcionario)
+                .FirstOrDefaultAsync(x => x.TokenAssinaturaCliente == token);
+        }
     }
 }
