@@ -6,6 +6,7 @@
         public const string FuncionarioVisualizar = "Funcionario.Visualizar";
         public const string FuncionarioCriar = "Funcionario.Criar";
         public const string FuncionarioAtualizar = "Funcionario.Atualizar";
+        public const string FuncionarioExcluir = "Funcionario.Excluir";
 
         // Cliente
         public const string ClienteCriar = "Cliente.Criar";

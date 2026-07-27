@@ -47,6 +47,9 @@ namespace OS_API.Helpers.Constantes
             options.AddPolicy(Permissoes.TipoAtendimentoAtualizar,
                 policy => policy.RequireClaim("Permissao", Permissoes.TipoAtendimentoAtualizar));
 
+            options.AddPolicy(Permissoes.FuncionarioExcluir,
+                policy => policy.RequireClaim("Permissao", Permissoes.FuncionarioExcluir));
+
         }
     }
 }

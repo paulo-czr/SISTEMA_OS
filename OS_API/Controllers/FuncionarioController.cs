@@ -31,6 +31,7 @@ namespace OS_API.Controllers
 
 
         [HttpPost]
+        [Authorize(Policy = Permissoes.FuncionarioCriar)]
         public async Task<IActionResult> Criar(CriarFuncionarioDto dto)
         {
 
@@ -42,7 +43,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = Permissoes.FuncionarioVisualizar)]
+        //[Authorize(Policy = Permissoes.FuncionarioVisualizar)]
         public async Task<IActionResult> GetPorId(int id)
         {
             var f = await _service.BuscarPorId(id);
@@ -50,7 +51,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = Permissoes.FuncionarioVisualizar)]
+        //[Authorize(Policy = Permissoes.FuncionarioVisualizar)]
         public async Task<IActionResult> Listar()
         {
             var funcionarios = await _service.Listar();
@@ -66,13 +67,14 @@ namespace OS_API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = Permissoes.FuncionarioExcluir)]
         public async Task<IActionResult> Remover(int id)
         {
             await _service.Remover(id);
             return NoContent();
         }
 
-        // NOVO: o próprio funcionário logado salva/troca a assinatura padrão dele.
+        // O próprio funcionário logado salva/troca a assinatura padrão dele.
         // Não recebe id na rota de propósito — sempre é a do usuário autenticado,
         // pra ninguém conseguir trocar a assinatura de outra pessoa.
         [HttpPut("assinatura")]

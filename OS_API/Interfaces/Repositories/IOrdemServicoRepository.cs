@@ -15,5 +15,7 @@ namespace OS_API.Interfaces.Repositories
         Task<OrdemServicoModel?> BuscarPorToken(string token);
 
         Task Remover(OrdemServicoModel ordemServico);
+
+        Task<OrdemServicoModel?> BuscarPorTipoAtendimento(TipoAtendimento tipo);
     }
 }

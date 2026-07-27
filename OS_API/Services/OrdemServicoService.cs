@@ -387,12 +387,12 @@ namespace OS_API.Services
         //data prazo menor
         private void FalharDatasInvalidas(DateTime? prazo, DateTime? inicio)
         {
-            if (prazo.HasValue && prazo.Value.Date < DateTime.Today)
+            if (prazo.HasValue && prazo.Value.Date < DateTime.Now)
             {
                 throw new ValidacaoException("O prazo não pode ser anterior à data de hoje.");
             }
 
-            if (inicio.HasValue && inicio.Value.Date < DateTime.Today)
+            if (inicio.HasValue && inicio.Value.Date < DateTime.Now)
             {
                 throw new ValidacaoException("A data de início não pode ser anterior à data de hoje.");
             }
@@ -401,6 +401,13 @@ namespace OS_API.Services
             {
                 throw new ValidacaoException("A data de início não pode ser maior que a data do prazo.");
             }
+        }
+
+        public async Task<BuscarOrdemServicoDto?> BuscarPorTipoAtendimento(TipoAtendimento tipo)
+        {
+            var os = await _repository.BuscarPorTipoAtendimento(tipo);
+            return OrdemServicoMapper.ParaDto(os);
+
         }
     }
 }

@@ -13,7 +13,8 @@ namespace OS_API.Helpers.Constantes
                 {
                 Permissoes.FuncionarioVisualizar,
                 Permissoes.FuncionarioCriar,
-                Permissoes. FuncionarioAtualizar,
+                Permissoes.FuncionarioAtualizar,
+                Permissoes.FuncionarioExcluir,
                 // Cliente
                 Permissoes.ClienteCriar,
                 Permissoes.ClienteAtualizar,
@@ -35,6 +36,7 @@ namespace OS_API.Helpers.Constantes
                 Permissoes.FuncionarioVisualizar,
                 Permissoes.FuncionarioCriar,
                 Permissoes. FuncionarioAtualizar,
+                Permissoes.FuncionarioExcluir,
                 // Cliente
                 Permissoes.ClienteCriar,
                 Permissoes.ClienteAtualizar,

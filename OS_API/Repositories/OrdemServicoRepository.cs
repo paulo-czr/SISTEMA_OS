@@ -67,5 +67,16 @@ namespace OS_API.Repositories
                     .ThenInclude(f => f.funcionario)
                 .FirstOrDefaultAsync(x => x.TokenAssinaturaCliente == token);
         }
+
+        public async Task<OrdemServicoModel?> BuscarPorTipoAtendimento(TipoAtendimento tipo)
+        {
+            return await _context.OrdensServico
+               .Include(o => o.Cliente)
+               .Include(o => o.TipoAtendimento)
+               .Include(o => o.Funcionarios)
+                   .ThenInclude(f => f.funcionario)
+               .FirstOrDefaultAsync(x => x.TipoAtendimento.Id == tipo.Id);
+
+        }
     }
 }

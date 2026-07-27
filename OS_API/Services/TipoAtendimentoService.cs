@@ -10,10 +10,14 @@ namespace OS_API.Services
     public class TipoAtendimentoService : ITipoAtendimentoService
     {
         private readonly ITipoAtendimentoRepository _repository;
+        //private readonly IOrdemServicoService _OrdemServicoService;
+        private readonly IOrdemServicoRepository _ordemServicoRepository;
 
-        public TipoAtendimentoService(ITipoAtendimentoRepository repository)
+        public TipoAtendimentoService(ITipoAtendimentoRepository repository, IOrdemServicoRepository ordemServicoRepository)
         {
             _repository = repository;
+            _ordemServicoRepository = ordemServicoRepository;
+            //_OrdemServicoService = ordemServicoService;
         }
 
         public async Task<TipoAtendimentoDto> Criar(CriarTipoAtendimentoDto dto)
@@ -71,8 +75,12 @@ namespace OS_API.Services
         {
             var tipoAtendimento = await BuscarOuFalhar(id);
 
-            // validar se tem os vinculada
-
+            //validar se tem os vinculada
+            var os = await _ordemServicoRepository.BuscarPorTipoAtendimento(tipoAtendimento);
+            if (os != null)
+            {
+                throw new ValidacaoException("Existe Os vinculada a esse tipo de atendimento, não e porssivel remover.");
+            }
             await _repository.Remover(tipoAtendimento);
         }
 

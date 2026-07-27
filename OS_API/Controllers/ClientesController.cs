@@ -81,6 +81,7 @@ namespace OS_API.Controllers
         }
 
         [HttpDelete("{id}")]
+       // [Authorize(Policy = Permissoes.Cli)]
         public async Task<IActionResult> Remover(int id)
         {
             await _clienteService.Remover(id);
