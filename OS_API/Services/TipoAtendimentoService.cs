@@ -79,7 +79,7 @@ namespace OS_API.Services
             var os = await _ordemServicoRepository.BuscarPorTipoAtendimento(tipoAtendimento);
             if (os != null)
             {
-                throw new ValidacaoException("Existe Os vinculada a esse tipo de atendimento, não e porssivel remover.");
+                throw new ValidacaoException("Existe Os vinculada a esse tipo de atendimento, não e possível remover.");
             }
             await _repository.Remover(tipoAtendimento);
         }

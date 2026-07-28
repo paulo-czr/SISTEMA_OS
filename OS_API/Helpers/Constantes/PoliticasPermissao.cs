@@ -50,6 +50,9 @@ namespace OS_API.Helpers.Constantes
             options.AddPolicy(Permissoes.FuncionarioExcluir,
                 policy => policy.RequireClaim("Permissao", Permissoes.FuncionarioExcluir));
 
+            options.AddPolicy(Permissoes.OSVisualizarTodas,
+               policy => policy.RequireClaim("Permissao", Permissoes.OSVisualizarTodas));
+
         }
     }
 }

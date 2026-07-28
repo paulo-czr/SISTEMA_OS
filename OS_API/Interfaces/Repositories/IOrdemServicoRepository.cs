@@ -17,5 +17,7 @@ namespace OS_API.Interfaces.Repositories
         Task Remover(OrdemServicoModel ordemServico);
 
         Task<OrdemServicoModel?> BuscarPorTipoAtendimento(TipoAtendimento tipo);
+
+        Task<List<OrdemServicoModel>> BuscarPorIdUsuarioFuncionario(string idUsuario);
     }
 }

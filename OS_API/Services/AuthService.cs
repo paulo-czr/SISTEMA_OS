@@ -24,6 +24,7 @@ namespace OS_API.Services
         {
             // Busca usuário
             var usuario = await _repositorio.BuscarPeloUserEmail(dto.usuario);
+
             //ver se existe
             if (usuario == null)
             {
@@ -33,6 +34,12 @@ namespace OS_API.Services
             if (!await _repositorio.ValidarSenha(usuario, dto.Senha))
             {
                 throw new EntidadeNaoEncontradaException("Senha invalida");
+            }
+
+            // ver se está ativo
+            if (!usuario.Ativo)
+            {
+                throw new ValidacaoException("Usuario ou senha invalida.");
             }
 
             // Claims básicas do JWT

@@ -146,8 +146,7 @@ namespace OS_API.Controllers
             return Ok(dados);
         }
 
-        // Cliente confirma a assinatura dele (também pública, sem login).
-        // POST /api/OrdemServico/assinatura/{token}
+        // assinatura do cliente
         [HttpPost("assinatura/{token}")]
         [AllowAnonymous]
         public async Task<IActionResult> SubmeterAssinaturaCliente(string token, [FromBody] SubmeterAssinaturaClienteDto dto)

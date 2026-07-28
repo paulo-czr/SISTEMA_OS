@@ -90,7 +90,7 @@ namespace OS_API.Services
         {
             var usuario = await BuscarOuFalhar(id);
 
-            // Nomes das permissões (claims) que esse usuário
+            // Nomes das permissões (claims) que esse usuário tem 
             var nomesVinculados = await _repository.BuscarPermissoes(usuario);
 
             var todasPermissoes = await _permissaoRepository.Listar();

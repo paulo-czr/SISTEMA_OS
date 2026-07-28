@@ -78,19 +78,28 @@ namespace OS_API.Models
         {
             get
             {
+                // OS já finalizada não muda de status
                 if (Status == StatusOs.Concluida)
                     return StatusOs.Concluida;
 
-                if (Prazo.HasValue && Prazo.Value.Date < DateTime.Now)
+                var agora = DateTime.Now;
+
+                // Garante que todas as datas estejam no fuso horário local antes de comparar
+                var prazo = Prazo?.ToLocalTime();
+                var inicio = DataHoraInicio?.ToLocalTime();
+
+                // Se estourou o prazo, está Atrasada
+                if (prazo < agora)
                     return StatusOs.Atrasada;
 
-                if (DataHoraInicio.HasValue && DataHoraInicio.Value.Date <= DateTime.Now)
+                //  Se tem data de início, verifica se já começou ou se ainda vai começar
+                if (inicio.HasValue)
                 {
-                    return StatusOs.EmAtendimento;
-                } else if(DataHoraInicio.HasValue && DataHoraInicio.Value.Date > DateTime.Now)
-                {
-                    return StatusOs.Agendada;
+                    return inicio <= agora
+                        ? StatusOs.EmAtendimento
+                        : StatusOs.Agendada;
                 }
+
                 return Status;
             }
         }

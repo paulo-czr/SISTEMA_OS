@@ -9,8 +9,8 @@ namespace OS_API.Helpers.Constantes
         {
             return tipo switch
             {
-                TipoUsuario.Administrador => new()
-                {
+            TipoUsuario.Administrador => new()
+            {
                 Permissoes.FuncionarioVisualizar,
                 Permissoes.FuncionarioCriar,
                 Permissoes.FuncionarioAtualizar,
@@ -21,6 +21,7 @@ namespace OS_API.Helpers.Constantes
                 // Ordem de Serviço
                 Permissoes.OSCriar,
                 Permissoes.OSAtualizar,
+                Permissoes.OSVisualizarTodas,
                 // Usuário
                 Permissoes.UsuarioVisualizar,
                 Permissoes.UsuarioAtualizar,
@@ -30,8 +31,10 @@ namespace OS_API.Helpers.Constantes
                 // Tipo de Atendimento
                 Permissoes.TipoAtendimentoCriar,
                 Permissoes.TipoAtendimentoAtualizar
-                },
-                TipoUsuario.Gestor => new()
+            },
+
+
+            TipoUsuario.Gestor => new()
             {
                 Permissoes.FuncionarioVisualizar,
                 Permissoes.FuncionarioCriar,
@@ -43,6 +46,7 @@ namespace OS_API.Helpers.Constantes
                 // Ordem de Serviço
                 Permissoes.OSCriar,
                 Permissoes.OSAtualizar,
+                Permissoes.OSVisualizarTodas,
                 // Usuário
                 Permissoes.UsuarioVisualizar,
                 Permissoes.UsuarioAtualizar,
@@ -52,10 +56,9 @@ namespace OS_API.Helpers.Constantes
                 // Tipo de Atendimento
                 Permissoes.TipoAtendimentoCriar,
                 Permissoes.TipoAtendimentoAtualizar,
-
-
             },
-                TipoUsuario.Tecnico => new()
+
+            TipoUsuario.Tecnico => new()
             {
                 Permissoes.FuncionarioVisualizar,
 

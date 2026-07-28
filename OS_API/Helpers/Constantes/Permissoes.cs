@@ -16,6 +16,7 @@
         // Ordem de Serviço
         public const string OSCriar = "OS.Criar";
         public const string OSAtualizar = "OS.Atualizar";
+        public const string OSVisualizarTodas = "OS.VisualizarTodas";
 
         // Usuário
         public const string UsuarioVisualizar = "Usuario.Visualizar";

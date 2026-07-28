@@ -34,6 +34,17 @@ namespace OS_API.Repositories
                 .FirstOrDefaultAsync(x => x.IdOs == id);
         }
 
+        public async Task<List<OrdemServicoModel>> BuscarPorIdUsuarioFuncionario(string idUsuario)
+        {
+            return await _context.OrdensServico
+                .Include(o => o.Cliente)
+                .Include(o => o.TipoAtendimento)
+                .Include(o => o.Funcionarios)
+                    .ThenInclude(f => f.funcionario)
+                .Where(x => x.Funcionarios.Any(f => f.funcionario.UsuarioId == idUsuario))
+                .ToListAsync();
+        }
+
         public async Task<List<OrdemServicoModel>> Listar()
         {
             return await _context.OrdensServico

@@ -54,6 +54,10 @@ namespace OS_API.Helpers.UsuarioLogado
             return usuario.IdFuncionario.Value;
         }
 
-
+        public async Task<bool> VerificarSeTemPermissao(string codPermissao)
+        {
+           var lista = await _usuarioService.ListarPermissoes(retornarUserLogado());
+           return  lista.Any(l => l.Nome == codPermissao);
+        }
     }
 }

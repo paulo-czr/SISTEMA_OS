@@ -1,6 +1,7 @@
 ﻿using OS_API.DTOs.Assinatura;
 using OS_API.DTOs.OrdemServico;
 using OS_API.Exceptionn;
+using OS_API.Helpers.Constantes;
 using OS_API.Helpers.UsuarioLogado;
 using OS_API.Interfaces.Repositories;
 using OS_API.Interfaces.Services;
@@ -147,11 +148,23 @@ namespace OS_API.Services
 
         public async Task<List<BuscarOrdemServicoDto>> Listar()
         {
-            var ordensServico = await _repository.Listar();
+            ICollection<OrdemServicoModel> ordensServico = new List<OrdemServicoModel>();
 
-            return ordensServico
-                .Select(OrdemServicoMapper.ParaDto)
-                .ToList();
+            //verificar se tem a permissão para visualizar todas as OS
+            var permitido = await _usuarioLogado.VerificarSeTemPermissao(Permissoes.OSVisualizarTodas);
+            if (permitido)
+            {
+                 ordensServico = await _repository.Listar();
+            }
+            else
+            {
+                ordensServico = await _repository.BuscarPorIdUsuarioFuncionario(_usuarioLogado.IdUsuario!);
+            }
+
+
+             return ordensServico
+                 .Select(OrdemServicoMapper.ParaDto)
+                 .ToList();
         }
 
         // Só atualiza o relatório técnico, sem tocar em mais nenhum campo da OS.
@@ -384,20 +397,26 @@ namespace OS_API.Services
             return ordemServico.ArquivoPdf;
         }
 
-        //data prazo menor
+
         private void FalharDatasInvalidas(DateTime? prazo, DateTime? inicio)
         {
-            if (prazo.HasValue && prazo.Value.Date < DateTime.Now)
+            var agora = DateTime.Now;
+
+            var prazoLocal = prazo?.ToLocalTime();
+            var inicioLocal = inicio?.ToLocalTime();
+
+            // Compara data E hora exata
+            if (prazoLocal < agora)
             {
-                throw new ValidacaoException("O prazo não pode ser anterior à data de hoje.");
+                throw new ValidacaoException("O prazo não pode ser anterior à data e hora atual.");
             }
 
-            if (inicio.HasValue && inicio.Value.Date < DateTime.Now)
+            if (inicioLocal < agora)
             {
-                throw new ValidacaoException("A data de início não pode ser anterior à data de hoje.");
+                throw new ValidacaoException("A data de início não pode ser anterior à data e hora atual.");
             }
 
-            if (prazo.HasValue && inicio.HasValue && inicio.Value > prazo.Value)
+            if (inicioLocal > prazoLocal)
             {
                 throw new ValidacaoException("A data de início não pode ser maior que a data do prazo.");
             }

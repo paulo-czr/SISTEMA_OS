@@ -29,6 +29,12 @@ namespace OS_API.Data.Seed
                     Descricao = "Permite atualizar funcionários.",
                     Modulo = "Funcionario"
                 },
+                new PermissaoModel
+                {
+                    Nome = Permissoes.FuncionarioExcluir,
+                    Descricao = "Permite excluir funcionários.",
+                    Modulo = "Funcionario"
+                },
                 // Cliente
                 new PermissaoModel
                 {
@@ -53,6 +59,12 @@ namespace OS_API.Data.Seed
                 {
                     Nome = Permissoes.OSAtualizar,
                     Descricao = "Permite atualizar ordens de serviço.",
+                    Modulo = "OS"
+                },
+                new PermissaoModel
+                {
+                    Nome = Permissoes.OSVisualizarTodas,
+                    Descricao = "Permite que o usuario veja somente suas Os",
                     Modulo = "OS"
                 },
                 // Usuário

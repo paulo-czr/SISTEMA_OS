@@ -16,5 +16,7 @@ namespace OS_API.Helpers.UsuarioLogado
         Task<int> RetornarIdFuncionarioLogado();
 
         IEnumerable<Claim> Claims { get; }
+
+        Task<Boolean> VerificarSeTemPermissao(String codPermissao);
     }
 }
