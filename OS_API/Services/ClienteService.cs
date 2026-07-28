@@ -14,12 +14,11 @@ namespace OS_API.Services
     public class ClienteService : IClienteService
     {
         private readonly IClienteRepository _repository;
-        private readonly IViaCepService _viaCepService;
 
-        public ClienteService(IClienteRepository repository, IViaCepService viaCepService)
+        public ClienteService(IClienteRepository repository)
         {
             _repository = repository;
-            _viaCepService = viaCepService;
+
         }
 
         // Creat
@@ -32,12 +31,9 @@ namespace OS_API.Services
             // Impede o cadastro de dois clientes com o mesmo CPF/CNPJ.
             await GarantirDocumentoDisponivel(documentoSoDigitos);
 
-            // Busca os dados de endereço direto na API do ViaCEP
-            var dadosCep = await ObterEnderecoOuFalhar(dto.Cep);
-
             var emailNormalizado = NormalizarEmail(dto.Email);
 
-            var clienteModel = ClienteMapper.ParaModel(dto, dadosCep, documentoSoDigitos, emailNormalizado);
+            var clienteModel = ClienteMapper.ParaModel(dto, documentoSoDigitos, emailNormalizado);
 
             clienteModel = await _repository.Adicionar(clienteModel);
 
@@ -96,37 +92,22 @@ namespace OS_API.Services
 
             var cepNormalizado = SomenteDigitos.Extrair(dto.Cep);
 
-            string? rua = cliente.Rua;
-            string? cidade = cliente.Cidade;
-            string? uf = cliente.Uf;
+            cliente.AtualizarDados(
+                    dto.TipoPessoa,
+                    dto.NomeFantasia,
+                    dto.RazaoSocial,
+                    documentoNormalizado,
+                    dto.Telefone,
+                    emailNormalizado,
+                    cepNormalizado,
+                    dto.Rua,
+                    dto.Cidade,
+                    dto.Uf,
+                    dto.Bairro,
+                    dto.Complemento,
+                    dto.Numero,
+                    dto.Ativo);
 
-            // Só consulta a API externa do ViaCEP quando o CEP realmente muda
-            if (cepNormalizado != cliente.Cep)
-            {
-                var dadosCep = await ObterEnderecoOuFalhar(cepNormalizado);
-
-                rua = dadosCep.Rua;
-                cidade = dadosCep.Cidade;
-                uf = dadosCep.Uf;
-            }
-
-            AplicarDadosAtualizados(
-                cliente,
-                dto.TipoPessoa,
-                dto.NomeFantasia,
-                dto.RazaoSocial,
-                documentoNormalizado,
-                dto.Telefone,
-                emailNormalizado,
-                cepNormalizado,
-                rua,
-                cidade,
-                uf,
-                dto.Numero,
-                dto.Ativo);
-
-            // Uma única chamada a SaveChangesAsync (dentro do repositório) persiste
-            // todas as alterações feitas na entidade.
             await _repository.Atualizar(cliente);
 
             return ClienteMapper.ParaDto(cliente);
@@ -184,15 +165,15 @@ namespace OS_API.Services
                 throw new ConflitoException("Já existe outro cliente cadastrado com esse e-mail.");
         }
 
-        private async Task<ViaCepDto> ObterEnderecoOuFalhar(string cep)
-        {
-            var dadosCep = await _viaCepService.ObterEnderecoPorCepAsync(cep);
+        //private async Task<ViaCepDto> ObterEnderecoOuFalhar(string cep)
+        //{
+        //    var dadosCep = await _viaCepService.ObterEnderecoPorCepAsync(cep);
 
-            if (dadosCep == null)
-                throw new ValidacaoException("O CEP informado é inválido ou não foi encontrado.");
+        //    if (dadosCep == null)
+        //        throw new ValidacaoException("O CEP informado é inválido ou não foi encontrado.");
 
-            return dadosCep;
-        }
+        //    return dadosCep;
+        //}
 
         public async Task<ClienteModel> BuscarClienteOuFalhar(int id)
         {
@@ -203,50 +184,5 @@ namespace OS_API.Services
 
             return cliente;
         }
-
-        /// <summary>
-        /// Pessoa Física nunca deve manter Razão Social preenchida — só Pessoa Jurídica.
-        /// </summary>
-        private static string? NormalizarRazaoSocial(TipoPessoaEnum tipoPessoa, string? razaoSocial)
-        {
-            if (tipoPessoa == TipoPessoaEnum.Fisica)
-                return null;
-
-            return string.IsNullOrWhiteSpace(razaoSocial) ? null : razaoSocial.Trim();
-        }
-
-
-        private static void AplicarDadosAtualizados(
-            ClienteModel cliente,
-            TipoPessoaEnum tipoPessoa,
-            string nomeFantasia,
-            string? razaoSocial,
-            string documentoNormalizado,
-            string? telefone,
-            string? emailNormalizado,
-            string cepNormalizado,
-            string? rua,
-            string? cidade,
-            string? uf,
-            string? numero,
-            bool ativo)
-        {
-            cliente.TipoPessoa = tipoPessoa;
-            cliente.NomeFantasia = nomeFantasia.Trim();
-            cliente.RazaoSocial = NormalizarRazaoSocial(tipoPessoa, razaoSocial);
-            cliente.Documento = documentoNormalizado;
-            cliente.Telefone = telefone;
-            cliente.Email = emailNormalizado;
-            cliente.Cep = cepNormalizado;
-            cliente.Rua = rua;
-            cliente.Cidade = cidade;
-            cliente.Uf = uf;
-            cliente.Numero = numero;
-            cliente.Ativo = ativo;
-        }
-
-        
-    }
-
-     
+    }    
 }

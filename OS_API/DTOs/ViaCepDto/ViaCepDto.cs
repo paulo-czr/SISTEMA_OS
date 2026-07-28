@@ -17,6 +17,12 @@ namespace OS_API.DTOs.ViaCepDto
         [JsonPropertyName("logradouro")]
         public string? Rua {  get; set; }
 
+        [JsonPropertyName("complemento")]
+        public string? Complemento { get; set; }
+
+        [JsonPropertyName("bairro")]
+        public string? Bairro { get; set; }
+
         [JsonPropertyName("erro")]
         [JsonConverter(typeof(BooleanFlexivelConverter))]
         public bool Erro { get; set; }
