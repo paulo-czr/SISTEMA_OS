@@ -9,7 +9,7 @@ namespace OS_API.Mappings
     {
         public static ClienteModel ParaModel(
             CriarClienteDto dto,
-            ViaCepDto dadosCep,
+            // ViaCepDto dadosCep,
             string documentoNormalizado,
             string? emailNormalizado)
         {
@@ -25,10 +25,12 @@ namespace OS_API.Mappings
                 Telefone = dto.Telefone,
                 Email = emailNormalizado,
 
-                Cep = SomenteDigitos.Extrair(dadosCep.Cep ?? dto.Cep),
-                Rua = dadosCep.Rua,
-                Cidade = dadosCep.Cidade,
-                Uf = dadosCep.Uf,
+                Cep = SomenteDigitos.Extrair(dto.Cep),
+                Uf = dto.Uf,
+                Cidade = dto.Cidade,
+                Bairro = dto.Bairro,
+                Rua = dto.Rua,           
+                Complemento = dto.Complemento,
                 Numero = dto.Numero,
                 Ativo = true
             };

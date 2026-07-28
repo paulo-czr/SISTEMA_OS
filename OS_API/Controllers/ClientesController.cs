@@ -10,32 +10,11 @@ namespace OS_API.Controllers
     [Route("api/[controller]")]
     public class ClientesController : ControllerBase
     {
-        private readonly IViaCepService _viaCepService;
         private readonly IClienteService _clienteService;
 
-        public ClientesController(IViaCepService viaCepService, IClienteService clienteService)
+        public ClientesController( IClienteService clienteService)
         {
-            _viaCepService = viaCepService;
             _clienteService = clienteService;
-        }
-
-        // Endpoint para o front-end consultar o CEP isoladamente.
-        // Exemplo: GET /api/clientes/consulta-cep/77800000
-        [HttpGet("consulta-cep/{cep}")]
-        public async Task<IActionResult> ConsultarCep(string cep)
-        {
-            var dadosCep = await _viaCepService.ObterEnderecoPorCepAsync(cep);
-
-            if (dadosCep == null)
-                return NotFound(new { mensagem = "CEP não encontrado ou inválido." });
-
-            return Ok(new
-            {
-                cep = dadosCep.Cep,
-                uf = dadosCep.Uf,
-                cidade = dadosCep.Cidade,
-                rua = dadosCep.Rua
-            });
         }
 
         /// Cadastro de cliente consumindo o ViaCEP para preencher os campos de endereço antes de salvar.

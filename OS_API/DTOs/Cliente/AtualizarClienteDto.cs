@@ -44,6 +44,20 @@ namespace OS_API.DTOs.Cliente
         [Cep]
         public string Cep { get; set; } = string.Empty;
 
+        [StringLength(2, ErrorMessage = "O campo UF deve ter no máximo {1} caracteres.")]
+        public string? Uf { get; set; }
+
+        [StringLength(150, ErrorMessage = "O campo Cidade deve ter no máximo {1} caracteres.")]
+        public string? Cidade { get; set; }
+
+        [StringLength(150, ErrorMessage = "O campo Bairro deve ter no máximo {1} caracteres.")]
+        public string? Bairro { get; set; }
+
+        [StringLength(150, ErrorMessage = "O campo Rua deve ter no máximo {1} caracteres.")]
+        public string? Rua { get; set; }
+
+        [StringLength(200, ErrorMessage = "O campo Complemento deve ter no máximo {1} caracteres.")]
+        public string? Complemento { get; set; }
 
         [StringLength(20, ErrorMessage = "O número deve ter no máximo {1} caracteres.")]
         public string? Numero { get; set; }
