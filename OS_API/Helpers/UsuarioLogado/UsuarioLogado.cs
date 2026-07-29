@@ -1,5 +1,6 @@
 ﻿using OS_API.Exceptionn;
 using OS_API.Interfaces.Services;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace OS_API.Helpers.UsuarioLogado
@@ -22,10 +23,10 @@ namespace OS_API.Helpers.UsuarioLogado
             Usuario?.Identity?.IsAuthenticated ?? false;
 
         public string? IdUsuario =>
-            Usuario?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Usuario?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? Usuario?.FindFirst("sub")?.Value;
 
         public string? UserName =>
-            Usuario?.FindFirst(ClaimTypes.Name)?.Value;
+            Usuario?.FindFirst(JwtRegisteredClaimNames.Name)?.Value ?? Usuario?.FindFirst("name")?.Value;
 
         public string? Email =>
             Usuario?.FindFirst(ClaimTypes.Email)?.Value;
