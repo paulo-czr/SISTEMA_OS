@@ -18,10 +18,6 @@ namespace OS_API.Models
 
         public DateTime DataAssinatura { get; set; }
 
-        public string Ip { get; set; } = string.Empty;
-
-        public string UserAgente { get; set; } = string.Empty;
-
         public TipoSignatario Tipo { get; set; }
 
     }

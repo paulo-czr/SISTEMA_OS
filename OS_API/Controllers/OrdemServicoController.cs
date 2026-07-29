@@ -98,7 +98,7 @@ namespace OS_API.Controllers
         }
 
         // Vincula um funcionário a uma OS.
-        // Ex.: POST /api/OrdemServico/5/funcionarios
+        // POST /api/OrdemServico/5/funcionarios
         [HttpPost("{idOs}/funcionarios")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> AdicionarFuncionario(int idOs, [FromBody] OsFuncionarioDto dto)
@@ -108,7 +108,7 @@ namespace OS_API.Controllers
         }
 
         // Remove o vínculo de um funcionário com a OS.
-        // Ex.: DELETE /api/OrdemServico/funcionarios/12
+        // DELETE /api/OrdemServico/funcionarios/12
         [HttpDelete("funcionarios/{idOsFuncionario}")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> RemoverFuncionario(int idOsFuncionario)
@@ -118,7 +118,7 @@ namespace OS_API.Controllers
         }
 
         // Define qual funcionário é o responsável pela OS.
-        // Ex.: PUT /api/OrdemServico/5/funcionarios/3/responsavel
+        // PUT /api/OrdemServico/5/funcionarios/3/responsavel
         [HttpPut("{idOs}/funcionarios/{idFuncionario}/responsavel")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> DefinirResponsavel(int idOs, int idFuncionario)

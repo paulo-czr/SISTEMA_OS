@@ -83,11 +83,12 @@ namespace OS_API.Services
 
             var ordemServico = OrdemServicoMapper.ParaModel(dto, idUsuario);
 
-            await _unidadeTrabalho.IniciarTransacaoAsync();
+           
 
             try
             {
-             
+                await _unidadeTrabalho.IniciarTransacaoAsync();
+
                 ordemServico = await _repository.Adicionar(ordemServico);
 
                 // Salvar o relacionamento dos funcionários vinculados à OS.
@@ -195,7 +196,7 @@ namespace OS_API.Services
             // Validar se os esta concluida
             falharSeOSConcluida(ordemServico);
 
-            if(dto.Status == StatusOs.Cancelada)
+            if(dto.Status != StatusOs.Cancelada || dto.Status != StatusOs.Concluida)
             {
                 ordemServico.DataHoraInicio = DateTime.UtcNow;
             }
@@ -274,8 +275,6 @@ namespace OS_API.Services
                 {
                     assinaturaFuncionario.ImagemAssinatura = dto.ImagemAssinaturaFuncionario;
                     assinaturaFuncionario.DataAssinatura = DateTime.UtcNow;
-                    assinaturaFuncionario.Ip = ip;
-                    assinaturaFuncionario.UserAgente = userAgent;
                     await _assinaturaRepository.Atualizar(assinaturaFuncionario);
                 }
                 else
@@ -287,8 +286,6 @@ namespace OS_API.Services
                         NomeSignatario = funcionario.Nome,
                         ImagemAssinatura = dto.ImagemAssinaturaFuncionario,
                         DataAssinatura = DateTime.UtcNow,
-                        Ip = ip,
-                        UserAgente = userAgent
                     });
                 }
 
@@ -379,8 +376,6 @@ namespace OS_API.Services
                     DocumentoSignatario = dto.DocumentoSignatario ?? string.Empty,
                     ImagemAssinatura = dto.ImagemAssinatura,
                     DataAssinatura = DateTime.UtcNow,
-                    Ip = http?.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
-                    UserAgente = http?.Request.Headers["User-Agent"].ToString() ?? string.Empty
                 });
 
                 ordemServico.ArquivoPdf = dto.ArquivoPdf;
@@ -450,7 +445,7 @@ namespace OS_API.Services
         public async Task<TokenAssinaturaDto> IniciarFotos(int id)
         {
             var ordemServico = await BuscarOuFalhar(id);
-            falharSeOSConcluida(ordemServico);
+            //falharSeOSConcluida(ordemServico);
 
             int idFuncionario = await _usuarioLogado.RetornarIdFuncionarioLogado();
             if (!await _osFuncionarioService.VerificarTecnicoEResponsavelAsync(ordemServico.IdOs, idFuncionario))
@@ -471,7 +466,7 @@ namespace OS_API.Services
         {
             var ordemServico = await _repository.BuscarPorTokenFotos(token);
             if (ordemServico == null)
-                throw new EntidadeNaoEncontradaException("Link de fotos inválido.");
+                throw new EntidadeNaoEncontradaException("Link de fotos inválido. Verifique se a OS ja tem as fotos incluidas ou gere outro link.");
 
             if (ordemServico.TokenFotosExpiraEm == null || ordemServico.TokenFotosExpiraEm < DateTime.UtcNow)
                 throw new ValidacaoException("Este link de fotos expirou. Peça pro responsável gerar um novo.");
@@ -487,17 +482,29 @@ namespace OS_API.Services
         // Recebe o PDF de fotos montado no front e salva na OS, invalidando o token.
         public async Task SalvarFotos(string token, SalvarFotosDto dto)
         {
-            var ordemServico = await _repository.BuscarPorTokenFotos(token);
-            if (ordemServico == null)
-                throw new EntidadeNaoEncontradaException("Link de fotos inválido.");
+            try
+            {
+                await _unidadeTrabalho.IniciarTransacaoAsync();
+                var ordemServico = await _repository.BuscarPorTokenFotos(token);
+                if (ordemServico == null)
+                    throw new EntidadeNaoEncontradaException("Link de fotos inválido. Verifique se ja existe registro de fotos na OS ou gere outro link.");
 
-            if (ordemServico.TokenFotosExpiraEm == null || ordemServico.TokenFotosExpiraEm < DateTime.UtcNow)
-                throw new ValidacaoException("Este link de fotos expirou. Peça pro responsável gerar um novo.");
+                if (ordemServico.TokenFotosExpiraEm == null || ordemServico.TokenFotosExpiraEm < DateTime.UtcNow)
+                    throw new ValidacaoException("Este link de fotos expirou. gere um novo.");
 
-            ordemServico.ArquivoPdfFotos = dto.ArquivoPdfFotos;
-            ordemServico.TokenFotos = null;
-            ordemServico.TokenFotosExpiraEm = null;
-            await _repository.Atualizar(ordemServico);
+                ordemServico.ArquivoPdfFotos = dto.ArquivoPdfFotos;
+                ordemServico.TokenFotos = null;
+                ordemServico.TokenFotosExpiraEm = null;
+                await _repository.Atualizar(ordemServico);
+                await _unidadeTrabalho.ConfirmarTransacaoAsync();
+
+            }
+            catch(Exception e)
+            {
+                await _unidadeTrabalho.DesfazerTransacaoAsync();
+                throw;
+            }
+            
         }
 
         public async Task<byte[]?> ObterPdfFotos(int id)
