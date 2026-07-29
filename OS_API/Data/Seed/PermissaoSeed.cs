@@ -35,7 +35,16 @@ namespace OS_API.Data.Seed
                     Descricao = "Permite excluir funcionários.",
                     Modulo = "Funcionario"
                 },
+
+
                 // Cliente
+                new PermissaoModel
+                {
+                    Nome = Permissoes.ClienteVisualizar,
+                    Descricao = "Permite visualizar clientes.",
+                    Modulo = "Cliente"
+                },
+
                 new PermissaoModel
                 {
                     Nome = Permissoes.ClienteCriar,
@@ -48,7 +57,22 @@ namespace OS_API.Data.Seed
                     Descricao = "Permite atualizar clientes.",
                     Modulo = "Cliente"
                 },
+
+                new PermissaoModel
+                {
+                    Nome = Permissoes.ClienteExcluir,
+                    Descricao = "Permite excluir clientes.",
+                    Modulo = "Cliente"
+                },
+
+
                 // Ordem de Serviço
+                new PermissaoModel
+                {
+                    Nome = Permissoes.OSVisualizarTodas,
+                    Descricao = "Permite que o usuario veja todas as ordens de serviço",
+                    Modulo = "OS"
+                },
                 new PermissaoModel
                 {
                     Nome = Permissoes.OSCriar,
@@ -63,10 +87,12 @@ namespace OS_API.Data.Seed
                 },
                 new PermissaoModel
                 {
-                    Nome = Permissoes.OSVisualizarTodas,
-                    Descricao = "Permite que o usuario veja somente suas Os",
+                    Nome = Permissoes.OSExcluir,
+                    Descricao = "Permite excluir ordens de serviço.",
                     Modulo = "OS"
                 },
+
+
                 // Usuário
                 new PermissaoModel
                 {
@@ -92,7 +118,15 @@ namespace OS_API.Data.Seed
                     Descricao = "Permite gerenciar permissões dos usuários.",
                     Modulo = "Usuario"
                 },
+
+
                 // Tipo de Atendimento
+                new PermissaoModel
+                {
+                    Nome = Permissoes.TipoAtendimentoVisualizar,
+                    Descricao = "Permite visualizar tipos de atendimento.",
+                    Modulo = "TipoAtendimento"
+                },
                 new PermissaoModel
                 {
                     Nome = Permissoes.TipoAtendimentoCriar,
@@ -104,8 +138,14 @@ namespace OS_API.Data.Seed
                     Nome = Permissoes.TipoAtendimentoAtualizar,
                     Descricao = "Permite atualizar tipos de atendimento.",
                     Modulo = "TipoAtendimento"
+                },
+                new PermissaoModel
+                {
+                    Nome = Permissoes.TipoAtendimentoExcluir,
+                    Descricao = "Permite excluir tipos de atendimento.",
+                    Modulo = "TipoAtendimento"
                 }
-            };
+            };  
 
             var nomesExistentes = await context.Permissoes
                 .Select(p => p.Nome)

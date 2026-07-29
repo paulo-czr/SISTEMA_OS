@@ -16,12 +16,15 @@ namespace OS_API.Helpers.Constantes
                 Permissoes.FuncionarioAtualizar,
                 Permissoes.FuncionarioExcluir,
                 // Cliente
+                Permissoes.ClienteVisualizar,
                 Permissoes.ClienteCriar,
                 Permissoes.ClienteAtualizar,
+                Permissoes.ClienteExcluir,
                 // Ordem de Serviço
+                Permissoes.OSVisualizarTodas,
                 Permissoes.OSCriar,
                 Permissoes.OSAtualizar,
-                Permissoes.OSVisualizarTodas,
+                Permissoes.OSExcluir,
                 // Usuário
                 Permissoes.UsuarioVisualizar,
                 Permissoes.UsuarioAtualizar,
@@ -29,8 +32,10 @@ namespace OS_API.Helpers.Constantes
                 Permissoes.UsuarioGerenciarPermissoes,
                 Permissoes.UsuarioVisualizar,
                 // Tipo de Atendimento
+                Permissoes.TipoAtendimentoVisualizar,
                 Permissoes.TipoAtendimentoCriar,
-                Permissoes.TipoAtendimentoAtualizar
+                Permissoes.TipoAtendimentoAtualizar,
+                Permissoes.TipoAtendimentoExcluir
             },
 
 
@@ -38,15 +43,18 @@ namespace OS_API.Helpers.Constantes
             {
                 Permissoes.FuncionarioVisualizar,
                 Permissoes.FuncionarioCriar,
-                Permissoes. FuncionarioAtualizar,
+                Permissoes.FuncionarioAtualizar,
                 Permissoes.FuncionarioExcluir,
                 // Cliente
+                Permissoes.ClienteVisualizar,
                 Permissoes.ClienteCriar,
                 Permissoes.ClienteAtualizar,
+                Permissoes.ClienteExcluir,
                 // Ordem de Serviço
+                Permissoes.OSVisualizarTodas,
                 Permissoes.OSCriar,
                 Permissoes.OSAtualizar,
-                Permissoes.OSVisualizarTodas,
+                Permissoes.OSExcluir,
                 // Usuário
                 Permissoes.UsuarioVisualizar,
                 Permissoes.UsuarioAtualizar,
@@ -54,8 +62,10 @@ namespace OS_API.Helpers.Constantes
                 Permissoes.UsuarioGerenciarPermissoes,
                 Permissoes.UsuarioVisualizar,
                 // Tipo de Atendimento
+                Permissoes.TipoAtendimentoVisualizar,
                 Permissoes.TipoAtendimentoCriar,
                 Permissoes.TipoAtendimentoAtualizar,
+                Permissoes.TipoAtendimentoExcluir
             },
 
             TipoUsuario.Tecnico => new()
@@ -63,12 +73,16 @@ namespace OS_API.Helpers.Constantes
                 Permissoes.FuncionarioVisualizar,
 
                 // Cliente
+                Permissoes.ClienteVisualizar,
                 Permissoes.ClienteCriar,
                 Permissoes.ClienteAtualizar,
 
+                // OS
                 Permissoes.OSCriar,
                 Permissoes.OSAtualizar,
+
                 // Tipo de Atendimento
+                Permissoes.TipoAtendimentoVisualizar,
                 Permissoes.TipoAtendimentoCriar,
                 Permissoes.TipoAtendimentoAtualizar
             },

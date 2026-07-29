@@ -8,6 +8,8 @@ namespace OS_API.Helpers.Constantes
         //como vai ser muita permissao criei ele aqui
         public static void AdicionarPoliticas(AuthorizationOptions options)
         {
+
+            // Funcionario
             options.AddPolicy(Permissoes.FuncionarioVisualizar,
                 policy => policy.RequireClaim("Permissao", Permissoes.FuncionarioVisualizar));
 
@@ -17,11 +19,27 @@ namespace OS_API.Helpers.Constantes
             options.AddPolicy(Permissoes.FuncionarioAtualizar,
                 policy => policy.RequireClaim("Permissao", Permissoes.FuncionarioAtualizar));
 
+            options.AddPolicy(Permissoes.FuncionarioExcluir,
+                policy => policy.RequireClaim("Permissao", Permissoes.FuncionarioExcluir));
+
+
+            // Cliente
+            options.AddPolicy(Permissoes.ClienteVisualizar,
+                policy => policy.RequireClaim("Permissao", Permissoes.ClienteVisualizar));
+
             options.AddPolicy(Permissoes.ClienteCriar,
                 policy => policy.RequireClaim("Permissao", Permissoes.ClienteCriar));
 
             options.AddPolicy(Permissoes.ClienteAtualizar,
                 policy => policy.RequireClaim("Permissao", Permissoes.ClienteAtualizar));
+
+            options.AddPolicy(Permissoes.ClienteExcluir,
+                policy => policy.RequireClaim("Permissao", Permissoes.ClienteExcluir));
+
+
+            // OS
+            options.AddPolicy(Permissoes.OSVisualizarTodas,
+                policy => policy.RequireClaim("Permissao", Permissoes.OSVisualizarTodas));
 
             options.AddPolicy(Permissoes.OSCriar,
                 policy => policy.RequireClaim("Permissao", Permissoes.OSCriar));
@@ -29,6 +47,11 @@ namespace OS_API.Helpers.Constantes
             options.AddPolicy(Permissoes.OSAtualizar,
                 policy => policy.RequireClaim("Permissao", Permissoes.OSAtualizar));
 
+            options.AddPolicy(Permissoes.OSExcluir,
+                policy => policy.RequireClaim("Permissao", Permissoes.OSExcluir));
+
+
+            // Usuario
             options.AddPolicy(Permissoes.UsuarioVisualizar,
                 policy => policy.RequireClaim("Permissao", Permissoes.UsuarioVisualizar));
 
@@ -41,17 +64,19 @@ namespace OS_API.Helpers.Constantes
             options.AddPolicy(Permissoes.UsuarioGerenciarPermissoes,
                 policy => policy.RequireClaim("Permissao", Permissoes.UsuarioGerenciarPermissoes));
 
+
+            // Tipo Atendimento
+            options.AddPolicy(Permissoes.TipoAtendimentoVisualizar,
+                policy => policy.RequireClaim("Permissao", Permissoes.TipoAtendimentoVisualizar));
+
             options.AddPolicy(Permissoes.TipoAtendimentoCriar,
                 policy => policy.RequireClaim("Permissao", Permissoes.TipoAtendimentoCriar));
 
             options.AddPolicy(Permissoes.TipoAtendimentoAtualizar,
                 policy => policy.RequireClaim("Permissao", Permissoes.TipoAtendimentoAtualizar));
 
-            options.AddPolicy(Permissoes.FuncionarioExcluir,
-                policy => policy.RequireClaim("Permissao", Permissoes.FuncionarioExcluir));
-
-            options.AddPolicy(Permissoes.OSVisualizarTodas,
-               policy => policy.RequireClaim("Permissao", Permissoes.OSVisualizarTodas));
+            options.AddPolicy(Permissoes.TipoAtendimentoExcluir,
+                policy => policy.RequireClaim("Permissao", Permissoes.TipoAtendimentoExcluir));
 
         }
     }
