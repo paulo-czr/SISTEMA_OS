@@ -19,5 +19,7 @@ namespace OS_API.Interfaces.Repositories
         Task<OrdemServicoModel?> BuscarPorTipoAtendimento(TipoAtendimento tipo);
 
         Task<List<OrdemServicoModel>> BuscarPorIdUsuarioFuncionario(string idUsuario);
+
+        Task<OrdemServicoModel?> BuscarPorTokenFotos(string token);
     }
 }

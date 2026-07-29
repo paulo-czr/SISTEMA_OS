@@ -39,6 +39,8 @@ namespace OS_API.DTOs.OrdemServico
         public bool PossuiPdfAssinado { get; set; }
 
         public List<OsFuncionarioDto> Funcionarios { get; set; } = new();
+
+        public bool PossuiPdfFotos { get; set; }
     }
 
 }

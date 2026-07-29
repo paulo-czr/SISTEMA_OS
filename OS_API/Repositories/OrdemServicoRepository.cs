@@ -89,5 +89,12 @@ namespace OS_API.Repositories
                .FirstOrDefaultAsync(x => x.TipoAtendimento.Id == tipo.Id);
 
         }
+
+        public async Task<OrdemServicoModel?> BuscarPorTokenFotos(string token)
+        {
+            return await _context.OrdensServico
+                .Include(o => o.Cliente)
+                .FirstOrDefaultAsync(x => x.TokenFotos == token);
+        }
     }
 }

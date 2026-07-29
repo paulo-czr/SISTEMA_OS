@@ -6,7 +6,6 @@
         public string ImagemAssinaturaFuncionario { get; set; } = string.Empty; // base64 (PNG)
 
         // Se true, essa assinatura também vira a assinatura padrão do funcionário
-        // (usada automaticamente da próxima vez, sem precisar desenhar de novo).
         public bool SalvarComoPadrao { get; set; }
     }
 }
