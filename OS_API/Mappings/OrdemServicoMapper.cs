@@ -47,7 +47,8 @@ namespace OS_API.Mappings
                         Responsavel = f.Responsavel
                     })
                     .ToList(),
-                PossuiPdfAssinado = model.ArquivoPdf != null && model.ArquivoPdf.Length > 0
+                PossuiPdfAssinado = model.ArquivoPdf != null && model.ArquivoPdf.Length > 0,
+                PossuiPdfFotos = model.ArquivoPdfFotos != null && model.ArquivoPdfFotos.Length > 0,
             };
         }
 

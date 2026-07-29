@@ -47,6 +47,10 @@ namespace OS_API.Models
 
         public DateTime? TokenAssinaturaExpiraEm { get; set; }
 
+        public string? TokenFotos { get; set; }
+        public DateTime? TokenFotosExpiraEm { get; set; }
+        public byte[]? ArquivoPdfFotos { get; set; } = Array.Empty<byte>();
+
         public ICollection<AssinaturaOsModel> Assinaturas { get; set; }
     = new List<AssinaturaOsModel>();
 
@@ -81,6 +85,10 @@ namespace OS_API.Models
                 // OS já finalizada não muda de status
                 if (Status == StatusOs.Concluida)
                     return StatusOs.Concluida;
+
+                // OS ja cancelada
+                if (Status == StatusOs.Cancelada)
+                    return StatusOs.Cancelada;
 
                 var agora = DateTime.Now;
 
