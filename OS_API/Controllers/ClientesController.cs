@@ -39,6 +39,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet("id/{id}")]
+        [Authorize(Policy = Permissoes.ClienteVisualizar)]
         public async Task<IActionResult> BuscarPorId(int id)
         {
             var cliente = await _clienteService.BuscarPorId(id);
@@ -46,6 +47,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet("documento/{documento}")]
+        [Authorize(Policy = Permissoes.ClienteVisualizar)]
         public async Task<IActionResult> BuscarPorDocumento(string documento)
         {
             var cliente = await _clienteService.BuscarPorDocumento(documento);
@@ -53,6 +55,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Permissoes.ClienteVisualizar)]
         public async Task<IActionResult> Listar()
         {
             var clientes = await _clienteService.Listar();
@@ -60,7 +63,7 @@ namespace OS_API.Controllers
         }
 
         [HttpDelete("{id}")]
-       // [Authorize(Policy = Permissoes.Cli)]
+        [Authorize(Policy = Permissoes.ClienteExcluir)]
         public async Task<IActionResult> Remover(int id)
         {
             await _clienteService.Remover(id);

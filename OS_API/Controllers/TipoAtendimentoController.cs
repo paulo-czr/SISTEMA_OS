@@ -38,6 +38,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = Permissoes.TipoAtendimentoVisualizar)]
         public async Task<IActionResult> BuscarPorId(int id)
         {
             var tipo = await _service.BuscarPorId(id);
@@ -45,6 +46,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Permissoes.TipoAtendimentoVisualizar)]
         public async Task<IActionResult> Listar()
         {
             var tipos = await _service.Listar();
@@ -52,6 +54,7 @@ namespace OS_API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize (Policy = Permissoes.TipoAtendimentoExcluir)]
         public async Task<IActionResult> Remover(int id)
         {
             await _service.Remover(id);

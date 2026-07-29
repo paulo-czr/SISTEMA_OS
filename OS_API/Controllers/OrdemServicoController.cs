@@ -63,6 +63,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> BuscarPorId(int id)
         {
             var ordemServico = await _service.BuscarPorId(id);
@@ -70,6 +71,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Listar()
         {
             var ordensServico = await _service.Listar();
@@ -77,6 +79,7 @@ namespace OS_API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = Permissoes.OSExcluir)]
         public async Task<IActionResult> Remover(int id)
         {
             await _service.Remover(id);
@@ -88,6 +91,7 @@ namespace OS_API.Controllers
         // Lista os funcionários vinculados a uma OS.
         // GET /api/OrdemServico/5/funcionarios
         [HttpGet("{idOs}/funcionarios")]
+        [Authorize]
         public async Task<IActionResult> ListarFuncionarios(int idOs)
         {
             var funcionarios = await _osFuncionarioService.ObterTecnicosDaOsAsync(idOs);

@@ -43,7 +43,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet("{id}")]
-        //[Authorize(Policy = Permissoes.FuncionarioVisualizar)]
+        [Authorize(Policy = Permissoes.FuncionarioVisualizar)]
         public async Task<IActionResult> GetPorId(int id)
         {
             var f = await _service.BuscarPorId(id);
@@ -51,7 +51,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Policy = Permissoes.FuncionarioVisualizar)]
+        [Authorize(Policy = Permissoes.FuncionarioVisualizar)]
         public async Task<IActionResult> Listar()
         {
             var funcionarios = await _service.Listar();

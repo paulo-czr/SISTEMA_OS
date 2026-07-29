@@ -46,7 +46,8 @@ namespace OS_API.Services
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, usuario.Id),
-                new Claim(JwtRegisteredClaimNames.Name, usuario.UserName!)
+                new Claim(JwtRegisteredClaimNames.Name, usuario.UserName!),
+                new Claim("SecurityStamp", usuario.SecurityStamp!)
             };
 
             // Busca as claims cadastradas no Identity

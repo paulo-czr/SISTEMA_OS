@@ -12,7 +12,9 @@ using OS_API.Interfaces.Services;
 using OS_API.Models;
 using OS_API.Repositories;
 using OS_API.Services;
+using System.Security.Claims;
 using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +29,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services
     .AddIdentity<UsuarioModel, IdentityRole>(options =>
     {
-        // Configura��es de senha 
+        // Configuracoes de senha 
         options.Password.RequireDigit = true;
         options.Password.RequireLowercase = true;
         options.Password.RequireUppercase = true;
@@ -49,20 +51,42 @@ builder.Services
     })
     .AddJwtBearer(options =>
     {
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(
-                    builder.Configuration["Jwt:Key"]!
-                ))
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var userManager = context.HttpContext.RequestServices
+                    .GetRequiredService<UserManager<UsuarioModel>>();
+
+                var userId = context.Principal?.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                var stampNoToken = context.Principal?.FindFirstValue("SecurityStamp");
+
+                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(stampNoToken))
+                {
+                    context.Fail("Token inválido.");
+                    return;
+                }
+
+                var usuario = await userManager.FindByIdAsync(userId);
+
+                if (usuario == null || usuario.SecurityStamp != stampNoToken)
+                {
+                    context.Fail("Sessão expirada. Faça login novamente.");
+                }
+            }
         };
     });
 

@@ -114,6 +114,8 @@ namespace OS_API.Repositories
             {
                 await _userManager.AddClaimAsync(usuario, new Claim("Permissao", permissao));
             }
+
+            await _userManager.UpdateSecurityStampAsync(usuario);
         }
 
         public async Task<List<string>> BuscarPermissoes(UsuarioModel usuario)
@@ -142,6 +144,8 @@ namespace OS_API.Repositories
 
             if (novasClaims.Any())
                 await _userManager.AddClaimsAsync(usuario, novasClaims);
+
+            await _userManager.UpdateSecurityStampAsync(usuario);
         }
     }
 }

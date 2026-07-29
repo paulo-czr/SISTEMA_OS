@@ -216,7 +216,7 @@ namespace OS_API.Services
         {
             if (ordemServico.Status == StatusOs.Concluida)
             {
-                throw new ValidacaoException("OS ja concluida.");
+                throw new ValidacaoException("OS já concluída.");
             }
         }
         private async Task<OrdemServicoModel> BuscarOuFalhar(int id)
