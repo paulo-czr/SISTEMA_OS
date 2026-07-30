@@ -1,4 +1,5 @@
 ﻿using OS_API.Models;
+using OS_API.Models.Cliente;
 
 namespace OS_API.Interfaces.Repositories
 {
@@ -17,6 +18,8 @@ namespace OS_API.Interfaces.Repositories
         Task Remover(OrdemServicoModel ordemServico);
 
         Task<OrdemServicoModel?> BuscarPorTipoAtendimento(TipoAtendimento tipo);
+
+        Task<OrdemServicoModel?> BuscarPorCliente(ClienteModel cliente);
 
         Task<List<OrdemServicoModel>> BuscarPorIdUsuarioFuncionario(string idUsuario);
 
