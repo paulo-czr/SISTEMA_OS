@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OS_API.Data;
@@ -11,9 +12,11 @@ using OS_API.Data;
 namespace OS_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260728215950_fotosPdf")]
+    partial class fotosPdf
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,6 +180,11 @@ namespace OS_API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Ip")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<string>("NomeSignatario")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -187,6 +195,11 @@ namespace OS_API.Migrations
 
                     b.Property<int>("Tipo")
                         .HasColumnType("integer");
+
+                    b.Property<string>("UserAgente")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
 
@@ -208,9 +221,6 @@ namespace OS_API.Migrations
                     b.Property<bool>("Ativo")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Bairro")
-                        .HasColumnType("text");
-
                     b.Property<string>("Cep")
                         .IsRequired()
                         .HasMaxLength(8)
@@ -219,9 +229,6 @@ namespace OS_API.Migrations
                     b.Property<string>("Cidade")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Complemento")
-                        .HasColumnType("text");
 
                     b.Property<string>("Documento")
                         .IsRequired()

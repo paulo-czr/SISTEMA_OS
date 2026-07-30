@@ -83,11 +83,12 @@ namespace OS_API.Services
 
             var ordemServico = OrdemServicoMapper.ParaModel(dto, idUsuario);
 
-            await _unidadeTrabalho.IniciarTransacaoAsync();
+           
 
             try
             {
-             
+                await _unidadeTrabalho.IniciarTransacaoAsync();
+
                 ordemServico = await _repository.Adicionar(ordemServico);
 
                 // Salvar o relacionamento dos funcionários vinculados à OS.
@@ -192,13 +193,14 @@ namespace OS_API.Services
         {
             var ordemServico = await BuscarOuFalhar(id);
 
-            // Validar a transição de status 
+            // Validar se os esta concluida
             falharSeOSConcluida(ordemServico);
 
-
-            ordemServico.DataHoraInicio = DateTime.UtcNow;
-
-
+            if(dto.Status != StatusOs.Cancelada || dto.Status != StatusOs.Concluida)
+            {
+                ordemServico.DataHoraInicio = DateTime.UtcNow;
+            }
+           
             ordemServico.Status = dto.Status;
             await _repository.Atualizar(ordemServico);
             return OrdemServicoMapper.ParaDto(ordemServico);
@@ -233,80 +235,88 @@ namespace OS_API.Services
         // Funcionário responsável assina e gera o link/token de assinatura pro cliente.
         public async Task<TokenAssinaturaDto> IniciarAssinatura(int id, IniciarAssinaturaDto dto)
         {
-
-            var ordemServico = await BuscarOuFalhar(id);
-            falharSeOSConcluida(ordemServico);
-
-            if (ordemServico.DataHoraFim == null)
+            try
             {
-                ordemServico.DataHoraFim = DateTime.UtcNow;
-            }
+                await _unidadeTrabalho.IniciarTransacaoAsync();
+                var ordemServico = await BuscarOuFalhar(id);
+                falharSeOSConcluida(ordemServico);
 
-            int idFuncionario = await _usuarioLogado.RetornarIdFuncionarioLogado();
-
-            if (!await _osFuncionarioService.VerificarTecnicoEResponsavelAsync(ordemServico.IdOs, idFuncionario))
-            {
-                throw new ValidacaoException("Somente o funcionário responsável pode gerar o relatório.");
-            }
-
-            var funcionario = await _funcionarioService.BuscarPorId(idFuncionario);
-            if (funcionario == null)
-            {
-                throw new EntidadeNaoEncontradaException("Funcionário não encontrado.");
-            }
-
-            if (string.IsNullOrWhiteSpace(ordemServico.RelatorioTecnico))
-            {
-                throw new ValidacaoException("Preencha o relatório técnico antes de gerar o relatório assinado.");
-            }
-
-            var http = _httpContextAccessor.HttpContext;
-            var ip = http?.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
-            var userAgent = http?.Request.Headers["User-Agent"].ToString() ?? string.Empty;
-
-            // Substitui a assinatura do funcionário já registrada nessa OS, se houver
-            // (permite assinar de novo, trocando a que tinha sido usada antes).
-            var assinaturaFuncionario = await _assinaturaRepository.BuscarPorOsETipo(id, TipoSignatario.Funcionario);
-            if (assinaturaFuncionario != null)
-            {
-                assinaturaFuncionario.ImagemAssinatura = dto.ImagemAssinaturaFuncionario;
-                assinaturaFuncionario.DataAssinatura = DateTime.UtcNow;
-                assinaturaFuncionario.Ip = ip;
-                assinaturaFuncionario.UserAgente = userAgent;
-                await _assinaturaRepository.Atualizar(assinaturaFuncionario);
-            }
-            else
-            {
-                await _assinaturaRepository.Adicionar(new AssinaturaOsModel
+                if (ordemServico.DataHoraFim == null)
                 {
-                    IdOs = id,
-                    Tipo = TipoSignatario.Funcionario,
-                    NomeSignatario = funcionario.Nome,
-                    ImagemAssinatura = dto.ImagemAssinaturaFuncionario,
-                    DataAssinatura = DateTime.UtcNow,
-                    Ip = ip,
-                    UserAgente = userAgent
-                });
+                    ordemServico.DataHoraFim = DateTime.UtcNow;
+                }
+
+                int idFuncionario = await _usuarioLogado.RetornarIdFuncionarioLogado();
+
+                if (!await _osFuncionarioService.VerificarTecnicoEResponsavelAsync(ordemServico.IdOs, idFuncionario))
+                {
+                    throw new ValidacaoException("Somente o funcionário responsável pode gerar o relatório.");
+                }
+
+                var funcionario = await _funcionarioService.BuscarPorId(idFuncionario);
+                if (funcionario == null)
+                {
+                    throw new EntidadeNaoEncontradaException("Funcionário não encontrado.");
+                }
+
+                if (string.IsNullOrWhiteSpace(ordemServico.RelatorioTecnico))
+                {
+                    throw new ValidacaoException("Preencha o relatório técnico antes de gerar o relatório assinado.");
+                }
+
+                var http = _httpContextAccessor.HttpContext;
+                var ip = http?.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+                var userAgent = http?.Request.Headers["User-Agent"].ToString() ?? string.Empty;
+
+                // Substitui a assinatura do funcionário já registrada nessa OS, se houver
+                // (permite assinar de novo, trocando a que tinha sido usada antes).
+                var assinaturaFuncionario = await _assinaturaRepository.BuscarPorOsETipo(id, TipoSignatario.Funcionario);
+                if (assinaturaFuncionario != null)
+                {
+                    assinaturaFuncionario.ImagemAssinatura = dto.ImagemAssinaturaFuncionario;
+                    assinaturaFuncionario.DataAssinatura = DateTime.UtcNow;
+                    await _assinaturaRepository.Atualizar(assinaturaFuncionario);
+                }
+                else
+                {
+                    await _assinaturaRepository.Adicionar(new AssinaturaOsModel
+                    {
+                        IdOs = id,
+                        Tipo = TipoSignatario.Funcionario,
+                        NomeSignatario = funcionario.Nome,
+                        ImagemAssinatura = dto.ImagemAssinaturaFuncionario,
+                        DataAssinatura = DateTime.UtcNow,
+                    });
+                }
+
+                // Se pedido, essa assinatura também vira a assinatura padrão do funcionário.
+                if (dto.SalvarComoPadrao)
+                {
+                    await _funcionarioService.AtualizarAssinaturaPadrao(idFuncionario, dto.ImagemAssinaturaFuncionario);
+                }
+
+                // Token opaco de 24h — 24 é fixo aqui por decisão explícita do produto;
+                // se precisar virar configurável, isso vira um parâmetro do método.
+                var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(24));
+                ordemServico.TokenAssinaturaCliente = token;
+                ordemServico.TokenAssinaturaExpiraEm = DateTime.UtcNow.AddHours(24);
+                await _repository.Atualizar(ordemServico);
+
+                await _unidadeTrabalho.ConfirmarTransacaoAsync();
+
+                return new TokenAssinaturaDto
+                {
+                    Token = token,
+                    ExpiraEm = ordemServico.TokenAssinaturaExpiraEm.Value
+                };
+
             }
-
-            // Se pedido, essa assinatura também vira a assinatura padrão do funcionário.
-            if (dto.SalvarComoPadrao)
+            catch (Exception e)
             {
-                await _funcionarioService.AtualizarAssinaturaPadrao(idFuncionario, dto.ImagemAssinaturaFuncionario);
+                await _unidadeTrabalho.DesfazerTransacaoAsync();
+                throw;
             }
-
-            // Token opaco de 24h — 24 é fixo aqui por decisão explícita do produto;
-            // se precisar virar configurável, isso vira um parâmetro do método.
-            var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(24));
-            ordemServico.TokenAssinaturaCliente = token;
-            ordemServico.TokenAssinaturaExpiraEm = DateTime.UtcNow.AddHours(24);
-            await _repository.Atualizar(ordemServico);
-
-            return new TokenAssinaturaDto
-            {
-                Token = token,
-                ExpiraEm = ordemServico.TokenAssinaturaExpiraEm.Value
-            };
+            
         }
 
         // Dados públicos (sem login) pra tela que o cliente abre pelo link/QR code.
@@ -339,7 +349,7 @@ namespace OS_API.Services
             };
         }
 
-        // Cliente confirma a assinatura dele: salva a assinatura + o PDF final, e invalida o token.
+        // Cliente confirma a assinatura  salva a assinatura + o PDF final, e invalida o token.
         public async Task SubmeterAssinaturaCliente(string token, SubmeterAssinaturaClienteDto dto)
         {
             try
@@ -366,8 +376,6 @@ namespace OS_API.Services
                     DocumentoSignatario = dto.DocumentoSignatario ?? string.Empty,
                     ImagemAssinatura = dto.ImagemAssinatura,
                     DataAssinatura = DateTime.UtcNow,
-                    Ip = http?.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
-                    UserAgente = http?.Request.Headers["User-Agent"].ToString() ?? string.Empty
                 });
 
                 ordemServico.ArquivoPdf = dto.ArquivoPdf;
@@ -390,7 +398,7 @@ namespace OS_API.Services
            
         }
 
-        // Devolve o PDF assinado (ou null se ainda não foi gerado).
+        // Devolve o PDF
         public async Task<byte[]?> ObterPdf(int id)
         {
             var ordemServico = await BuscarOuFalhar(id);
@@ -427,6 +435,82 @@ namespace OS_API.Services
             var os = await _repository.BuscarPorTipoAtendimento(tipo);
             return OrdemServicoMapper.ParaDto(os);
 
+        }
+
+
+
+
+        //parte das fotos pdf
+        // Gera o link/token pra registrar fotos 2H
+        public async Task<TokenAssinaturaDto> IniciarFotos(int id)
+        {
+            var ordemServico = await BuscarOuFalhar(id);
+            //falharSeOSConcluida(ordemServico);
+
+            int idFuncionario = await _usuarioLogado.RetornarIdFuncionarioLogado();
+            if (!await _osFuncionarioService.VerificarTecnicoEResponsavelAsync(ordemServico.IdOs, idFuncionario))
+            {
+                throw new ValidacaoException("Somente o funcionário responsável pode gerar o link de fotos.");
+            }
+
+            var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(24));
+            ordemServico.TokenFotos = token;
+            ordemServico.TokenFotosExpiraEm = DateTime.UtcNow.AddHours(2);
+            await _repository.Atualizar(ordemServico);
+
+            return new TokenAssinaturaDto { Token = token, ExpiraEm = ordemServico.TokenFotosExpiraEm.Value };
+        }
+
+        //tela de fotos.
+        public async Task<FotosPublicaDto> BuscarFotosPublica(string token)
+        {
+            var ordemServico = await _repository.BuscarPorTokenFotos(token);
+            if (ordemServico == null)
+                throw new EntidadeNaoEncontradaException("Link de fotos inválido. Verifique se a OS ja tem as fotos incluidas ou gere outro link.");
+
+            if (ordemServico.TokenFotosExpiraEm == null || ordemServico.TokenFotosExpiraEm < DateTime.UtcNow)
+                throw new ValidacaoException("Este link de fotos expirou. Peça pro responsável gerar um novo.");
+
+            return new FotosPublicaDto
+            {
+                IdOs = ordemServico.IdOs,
+                TituloOs = ordemServico.TituloOs,
+                NomeCliente = ordemServico.Cliente.NomeFantasia,
+            };
+        }
+
+        // Recebe o PDF de fotos montado no front e salva na OS, invalidando o token.
+        public async Task SalvarFotos(string token, SalvarFotosDto dto)
+        {
+            try
+            {
+                await _unidadeTrabalho.IniciarTransacaoAsync();
+                var ordemServico = await _repository.BuscarPorTokenFotos(token);
+                if (ordemServico == null)
+                    throw new EntidadeNaoEncontradaException("Link de fotos inválido. Verifique se ja existe registro de fotos na OS ou gere outro link.");
+
+                if (ordemServico.TokenFotosExpiraEm == null || ordemServico.TokenFotosExpiraEm < DateTime.UtcNow)
+                    throw new ValidacaoException("Este link de fotos expirou. gere um novo.");
+
+                ordemServico.ArquivoPdfFotos = dto.ArquivoPdfFotos;
+                ordemServico.TokenFotos = null;
+                ordemServico.TokenFotosExpiraEm = null;
+                await _repository.Atualizar(ordemServico);
+                await _unidadeTrabalho.ConfirmarTransacaoAsync();
+
+            }
+            catch(Exception e)
+            {
+                await _unidadeTrabalho.DesfazerTransacaoAsync();
+                throw;
+            }
+            
+        }
+
+        public async Task<byte[]?> ObterPdfFotos(int id)
+        {
+            var ordemServico = await BuscarOuFalhar(id);
+            return ordemServico.ArquivoPdfFotos;
         }
     }
 }

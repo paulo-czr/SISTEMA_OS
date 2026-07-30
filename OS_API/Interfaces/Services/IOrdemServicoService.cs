@@ -33,5 +33,11 @@ namespace OS_API.Interfaces.Services
         Task<byte[]?> ObterPdf(int id);
 
         Task<BuscarOrdemServicoDto?> BuscarPorTipoAtendimento(TipoAtendimento tipo);
+
+
+        Task<TokenAssinaturaDto> IniciarFotos(int id);
+        Task<FotosPublicaDto> BuscarFotosPublica(string token);
+        Task SalvarFotos(string token, SalvarFotosDto dto);
+        Task<byte[]?> ObterPdfFotos(int id);
     }
 }

@@ -87,7 +87,6 @@ namespace OS_API.Controllers
         }
 
 
-
         // Lista os funcionários vinculados a uma OS.
         // GET /api/OrdemServico/5/funcionarios
         [HttpGet("{idOs}/funcionarios")]
@@ -99,7 +98,7 @@ namespace OS_API.Controllers
         }
 
         // Vincula um funcionário a uma OS.
-        // Ex.: POST /api/OrdemServico/5/funcionarios
+        // POST /api/OrdemServico/5/funcionarios
         [HttpPost("{idOs}/funcionarios")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> AdicionarFuncionario(int idOs, [FromBody] OsFuncionarioDto dto)
@@ -109,7 +108,7 @@ namespace OS_API.Controllers
         }
 
         // Remove o vínculo de um funcionário com a OS.
-        // Ex.: DELETE /api/OrdemServico/funcionarios/12
+        // DELETE /api/OrdemServico/funcionarios/12
         [HttpDelete("funcionarios/{idOsFuncionario}")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> RemoverFuncionario(int idOsFuncionario)
@@ -119,7 +118,7 @@ namespace OS_API.Controllers
         }
 
         // Define qual funcionário é o responsável pela OS.
-        // Ex.: PUT /api/OrdemServico/5/funcionarios/3/responsavel
+        // PUT /api/OrdemServico/5/funcionarios/3/responsavel
         [HttpPut("{idOs}/funcionarios/{idFuncionario}/responsavel")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> DefinirResponsavel(int idOs, int idFuncionario)
@@ -169,6 +168,45 @@ namespace OS_API.Controllers
                 throw new EntidadeNaoEncontradaException("Esta OS ainda não tem um relatório assinado.");
 
             return File(bytes, "application/pdf", $"os-{id}.pdf");
+        }
+
+
+
+
+        //parte das fotos
+        [HttpPost("{id}/fotos/iniciar")]
+        [Authorize(Policy = Permissoes.OSAtualizar)]
+        public async Task<IActionResult> IniciarFotos(int id)
+        {
+            var resultado = await _service.IniciarFotos(id);
+            return Ok(resultado);
+        }
+
+        [HttpGet("fotos/{token}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> BuscarFotosPublica(string token)
+        {
+            var dados = await _service.BuscarFotosPublica(token);
+            return Ok(dados);
+        }
+
+        [HttpPost("fotos/{token}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SalvarFotos(string token, [FromBody] SalvarFotosDto dto)
+        {
+            await _service.SalvarFotos(token, dto);
+            return NoContent();
+        }
+
+        [HttpGet("{id}/pdf-fotos")]
+        [Authorize]
+        public async Task<IActionResult> ObterPdfFotos(int id)
+        {
+            var bytes = await _service.ObterPdfFotos(id);
+            if (bytes == null || bytes.Length == 0)
+                throw new EntidadeNaoEncontradaException("Esta OS ainda não tem fotos registradas.");
+
+            return File(bytes, "application/pdf", $"os-{id}-fotos.pdf");
         }
     }
 }

@@ -26,11 +26,6 @@ namespace OS_API.Data.Configurations
             builder.Property(x => x.DataAssinatura)
                 .IsRequired();
 
-            builder.Property(x => x.Ip)
-                .HasMaxLength(50);
-
-            builder.Property(x => x.UserAgente)
-                .HasMaxLength(500);
 
             builder.Property(x => x.Tipo)
                 .HasConversion<int>();
