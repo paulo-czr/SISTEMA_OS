@@ -75,11 +75,11 @@ namespace OS_API.Services
         {
             var tipoAtendimento = await BuscarOuFalhar(id);
 
-            //validar se tem os vinculada
+            //validar se tem Ordem de Serviço vinculada
             var os = await _ordemServicoRepository.BuscarPorTipoAtendimento(tipoAtendimento);
             if (os != null)
             {
-                throw new ValidacaoException("Existe Os vinculada a esse tipo de atendimento, não e possível remover.");
+                throw new ValidacaoException("Existe Ordem de Serviço vinculada a esse tipo de atendimento, não é possível remover.");
             }
             await _repository.Remover(tipoAtendimento);
         }
