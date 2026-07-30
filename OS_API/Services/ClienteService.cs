@@ -7,6 +7,7 @@ using OS_API.Mappings;
 using OS_API.Models;
 using OS_API.Models.Cliente;
 using OS_API.Models.Enum;
+using OS_API.Repositories;
 using OS_API.Validation.Helpers;
 
 namespace OS_API.Services
@@ -14,10 +15,12 @@ namespace OS_API.Services
     public class ClienteService : IClienteService
     {
         private readonly IClienteRepository _repository;
+        private readonly IOrdemServicoRepository _ordemServicoRepository;
 
-        public ClienteService(IClienteRepository repository)
+        public ClienteService(IClienteRepository repository, IOrdemServicoRepository ordemServicoRepository)
         {
             _repository = repository;
+            _ordemServicoRepository = ordemServicoRepository;
 
         }
 
@@ -118,6 +121,13 @@ namespace OS_API.Services
         {
             var cliente = await BuscarClienteOuFalhar(id);
 
+            //validar se tem Ordem de Serviço vinculada
+            var os = await _ordemServicoRepository.BuscarPorCliente(cliente);
+            if (os != null)
+            {
+                throw new ValidacaoException("Existe Ordem de Serviço vinculada a esse cliente, não é possível remover.");
+            }
+
             await _repository.Remover(cliente);
         }
 
@@ -165,15 +175,6 @@ namespace OS_API.Services
                 throw new ConflitoException("Já existe outro cliente cadastrado com esse e-mail.");
         }
 
-        //private async Task<ViaCepDto> ObterEnderecoOuFalhar(string cep)
-        //{
-        //    var dadosCep = await _viaCepService.ObterEnderecoPorCepAsync(cep);
-
-        //    if (dadosCep == null)
-        //        throw new ValidacaoException("O CEP informado é inválido ou não foi encontrado.");
-
-        //    return dadosCep;
-        //}
 
         public async Task<ClienteModel> BuscarClienteOuFalhar(int id)
         {
