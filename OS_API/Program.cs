@@ -15,6 +15,8 @@ using OS_API.Services;
 using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -133,6 +135,71 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Rate Limiting - protege a API contra abuso, brute-force e DoS
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // Limite global (fallback): aplica-se a toda rota que não tenha uma política específica.
+    // Particionado por IP do cliente.
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    {
+        var chave = httpContext.Connection.RemoteIpAddress?.ToString() ?? "desconhecido";
+
+        return RateLimitPartition.GetFixedWindowLimiter(chave, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 120,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0
+        });
+    });
+
+    // Política restrita para login: mitiga brute-force de credenciais.
+    options.AddPolicy("login", httpContext =>
+    {
+        var chave = httpContext.Connection.RemoteIpAddress?.ToString() ?? "desconhecido";
+
+        return RateLimitPartition.GetFixedWindowLimiter(chave, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 5,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0
+        });
+    });
+
+    // Política restrita para rotas públicas/anônimas (tokens de assinatura, fotos, consulta de CEP):
+    // evita força bruta de tokens e uso da API como proxy para terceiros.
+    options.AddPolicy("publico", httpContext =>
+    {
+        var chave = httpContext.Connection.RemoteIpAddress?.ToString() ?? "desconhecido";
+
+        return RateLimitPartition.GetFixedWindowLimiter(chave, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 20,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0
+        });
+    });
+
+    // Resposta padronizada quando o limite é excedido
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            context.HttpContext.Response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds).ToString();
+        }
+
+        await context.HttpContext.Response.WriteAsync(
+            "{\"mensagem\":\"Muitas requisições. Tente novamente em instantes.\"}",
+            cancellationToken);
+    };
+});
+
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -212,6 +279,9 @@ app.UseHttpsRedirection();
 
 // Permitir requisi��es do Front-end
 app.UseCors("FrontEnd");
+
+// Rate Limiting - deve vir antes da autenticacao para conter abuso o quanto antes no pipeline
+app.UseRateLimiter();
 
 // Autenticao
 app.UseAuthentication();
