@@ -88,7 +88,6 @@ namespace OS_API.Controllers
 
 
         // Lista os funcionários vinculados a uma OS.
-        // GET /api/OrdemServico/5/funcionarios
         [HttpGet("{idOs}/funcionarios")]
         [Authorize]
         public async Task<IActionResult> ListarFuncionarios(int idOs)
@@ -98,7 +97,6 @@ namespace OS_API.Controllers
         }
 
         // Vincula um funcionário a uma OS.
-        // POST /api/OrdemServico/5/funcionarios
         [HttpPost("{idOs}/funcionarios")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> AdicionarFuncionario(int idOs, [FromBody] OsFuncionarioDto dto)
@@ -108,7 +106,6 @@ namespace OS_API.Controllers
         }
 
         // Remove o vínculo de um funcionário com a OS.
-        // DELETE /api/OrdemServico/funcionarios/12
         [HttpDelete("funcionarios/{idOsFuncionario}")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> RemoverFuncionario(int idOsFuncionario)
@@ -118,7 +115,6 @@ namespace OS_API.Controllers
         }
 
         // Define qual funcionário é o responsável pela OS.
-        // PUT /api/OrdemServico/5/funcionarios/3/responsavel
         [HttpPut("{idOs}/funcionarios/{idFuncionario}/responsavel")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> DefinirResponsavel(int idOs, int idFuncionario)
@@ -130,7 +126,6 @@ namespace OS_API.Controllers
 
         //-----------------------------------------
         // Funcionário responsável assina e gera o link/token de assinatura pro cliente.
-        // POST /api/OrdemServico/5/relatorio/iniciar-assinatura
         [HttpPost("{id}/relatorio/iniciar-assinatura")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
         public async Task<IActionResult> IniciarAssinatura(int id, [FromBody] IniciarAssinaturaDto dto)
@@ -140,7 +135,6 @@ namespace OS_API.Controllers
         }
 
         // Página PÚBLICA de assinatura — o cliente abre isso pelo link/QR code, sem estar logado.
-        // GET /api/OrdemServico/assinatura/{token}
         [HttpGet("assinatura/{token}")]
         [AllowAnonymous]
         public async Task<IActionResult> BuscarAssinaturaPublica(string token)

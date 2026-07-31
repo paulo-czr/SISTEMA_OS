@@ -63,6 +63,8 @@ namespace OS_API.Services
             // Validar se o Tipo de Atendimento informado existe.
             var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdTipoAtendimento);
 
+            FalharDataInvalidas(dto.Prazo);
+
 
             // Validar se existe apenas um funcionário marcado como responsável em dto.Funcionarios.
             if (dto.Funcionarios.Count(f => f.Responsavel) != 1)
@@ -74,9 +76,6 @@ namespace OS_API.Services
             {
                 throw new EntidadeNaoEncontradaException("Um funcionário não pode ser informado mais de uma vez.");
             }
-
-            //validar datas 
-            FalharDatasInvalidas(dto.Prazo, dto.DataHoraInicio);
 
             //pegar o usuario que registrou
             var idUsuario = _usuarioLogado.retornarUserLogado();
@@ -126,9 +125,6 @@ namespace OS_API.Services
             var cliente = await _clienteService.BuscarClienteOuFalhar(dto.IdCliente);
             // Validar se o Tipo de Atendimento informado existe.
             var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdTipoAtendimento);
-
-            //validar datas 
-            FalharDatasInvalidas(dto.Prazo, dto.DataHoraInicio);
 
             // não atualizar se tiver concluida
             falharSeOSConcluida(ordemServico);
@@ -406,12 +402,12 @@ namespace OS_API.Services
         }
 
 
-        private void FalharDatasInvalidas(DateTime? prazo, DateTime? inicio)
+        private void FalharDataInvalidas(DateTime? prazo)
         {
             var agora = DateTime.Now;
 
             var prazoLocal = prazo?.ToLocalTime();
-            var inicioLocal = inicio?.ToLocalTime();
+            //var inicioLocal = inicio?.ToLocalTime();
 
             // Compara data E hora exata
             if (prazoLocal < agora)
@@ -419,15 +415,15 @@ namespace OS_API.Services
                 throw new ValidacaoException("O prazo não pode ser anterior à data e hora atual.");
             }
 
-            if (inicioLocal < agora)
-            {
-                throw new ValidacaoException("A data de início não pode ser anterior à data e hora atual.");
-            }
+            //if (inicioLocal < agora)
+            //{
+            //    throw new ValidacaoException("A data de início não pode ser anterior à data e hora atual.");
+            //}
 
-            if (inicioLocal > prazoLocal)
-            {
-                throw new ValidacaoException("A data de início não pode ser maior que a data do prazo.");
-            }
+            //if (inicioLocal > prazoLocal)
+            //{
+            //    throw new ValidacaoException("A data de início não pode ser maior que a data do prazo.");
+            //}
         }
 
         public async Task<BuscarOrdemServicoDto?> BuscarPorTipoAtendimento(TipoAtendimento tipo)

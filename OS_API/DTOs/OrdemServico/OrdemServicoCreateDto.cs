@@ -18,8 +18,6 @@ namespace OS_API.DTOs.OrdemServico
         [Required(ErrorMessage = "É obrigatório informar o Cliente.")]
         public int IdCliente { get; set; }
 
-        public DateTime? DataHoraInicio { get; set; }
-
         public DateTime? Prazo { get; set; }
 
         public string? Observacao { get; set; }
