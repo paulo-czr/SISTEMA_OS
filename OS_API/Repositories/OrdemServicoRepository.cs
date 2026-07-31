@@ -2,6 +2,7 @@
 using OS_API.Data;
 using OS_API.Interfaces.Repositories;
 using OS_API.Models;
+using OS_API.Models.Cliente;
 
 namespace OS_API.Repositories
 {
@@ -90,6 +91,16 @@ namespace OS_API.Repositories
 
         }
 
+        public async Task<OrdemServicoModel?> BuscarPorCliente(ClienteModel cliente)
+        {
+            return await _context.OrdensServico
+                .Include(o => o.Cliente)
+                .Include(o => o.TipoAtendimento)
+                .Include(o => o.Funcionarios)
+                    .ThenInclude(f => f.funcionario)
+                .FirstOrDefaultAsync(x => x.Cliente.IdCliente == cliente.IdCliente);
+        }
+        
         public async Task<OrdemServicoModel?> BuscarPorTokenFotos(string token)
         {
             return await _context.OrdensServico
