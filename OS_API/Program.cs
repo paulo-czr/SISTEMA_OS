@@ -27,7 +27,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-// Configura��o do ASP.NET Core Identity
+// Configuração do ASP.NET Core Identity
 builder.Services
     .AddIdentity<UsuarioModel, IdentityRole>(options =>
     {
