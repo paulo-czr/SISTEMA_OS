@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using OS_API.Interfaces.Services;
 
 namespace OS_API.Controllers
@@ -16,6 +17,7 @@ namespace OS_API.Controllers
         }
 
         [HttpGet("consulta-cep/{cep}")]
+        [EnableRateLimiting("publico")]
         public async Task<IActionResult> ConsultarCep(string cep)
         {
             var dadosCep = await _viaCepService.ObterEnderecoPorCepAsync(cep);

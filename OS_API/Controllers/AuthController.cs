@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using OS_API.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,6 +26,7 @@ namespace OS_API.Controllers
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("login")]
         public async Task<IActionResult> Login(AuthCreateDto dto)
         {
             var usuario = await _authService.Login(dto);

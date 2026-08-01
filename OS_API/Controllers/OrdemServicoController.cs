@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using OS_API.DTOs.Assinatura;
 using OS_API.DTOs.OrdemServico;
 using OS_API.DTOs.OSFuncionario;
@@ -137,6 +138,7 @@ namespace OS_API.Controllers
         // Página PÚBLICA de assinatura — o cliente abre isso pelo link/QR code, sem estar logado.
         [HttpGet("assinatura/{token}")]
         [AllowAnonymous]
+        [EnableRateLimiting("publico")]
         public async Task<IActionResult> BuscarAssinaturaPublica(string token)
         {
             var dados = await _service.BuscarAssinaturaPublica(token);
@@ -146,6 +148,7 @@ namespace OS_API.Controllers
         // assinatura do cliente
         [HttpPost("assinatura/{token}")]
         [AllowAnonymous]
+        [EnableRateLimiting("publico")]
         public async Task<IActionResult> SubmeterAssinaturaCliente(string token, [FromBody] SubmeterAssinaturaClienteDto dto)
         {
             await _service.SubmeterAssinaturaCliente(token, dto);
@@ -178,6 +181,7 @@ namespace OS_API.Controllers
 
         [HttpGet("fotos/{token}")]
         [AllowAnonymous]
+        [EnableRateLimiting("publico")]
         public async Task<IActionResult> BuscarFotosPublica(string token)
         {
             var dados = await _service.BuscarFotosPublica(token);
@@ -186,6 +190,7 @@ namespace OS_API.Controllers
 
         [HttpPost("fotos/{token}")]
         [AllowAnonymous]
+        [EnableRateLimiting("publico")]
         public async Task<IActionResult> SalvarFotos(string token, [FromBody] SalvarFotosDto dto)
         {
             await _service.SalvarFotos(token, dto);
