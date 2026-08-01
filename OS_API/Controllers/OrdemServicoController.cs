@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using OS_API.DTOs.Assinatura;
 using OS_API.DTOs.OrdemServico;
+using OS_API.DTOs.OrdemServico.Filtro;
 using OS_API.DTOs.OSFuncionario;
 using OS_API.Exceptionn;
 using OS_API.Helpers.Constantes;
@@ -77,6 +78,16 @@ namespace OS_API.Controllers
         {
             var ordensServico = await _service.Listar();
             return Ok(ordensServico);
+        }
+
+      
+       
+        [HttpGet("paginado")]
+        [Authorize]
+        public async Task<IActionResult> ListarPaginado([FromQuery] FiltroOrdemServicoDto filtro)
+        {
+            var resultado = await _service.ListarPaginado(filtro);
+            return Ok(resultado);
         }
 
         [HttpDelete("{id}")]

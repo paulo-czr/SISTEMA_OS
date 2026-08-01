@@ -1,5 +1,6 @@
 ﻿using OS_API.DTOs.Assinatura;
 using OS_API.DTOs.OrdemServico;
+using OS_API.DTOs.OrdemServico.Filtro;
 using OS_API.Exceptionn;
 using OS_API.Helpers.Constantes;
 using OS_API.Helpers.UsuarioLogado;
@@ -151,7 +152,7 @@ namespace OS_API.Services
             var permitido = await _usuarioLogado.VerificarSeTemPermissao(Permissoes.OSVisualizarTodas);
             if (permitido)
             {
-                 ordensServico = await _repository.Listar();
+                ordensServico = await _repository.Listar();
             }
             else
             {
@@ -159,9 +160,32 @@ namespace OS_API.Services
             }
 
 
-             return ordensServico
-                 .Select(OrdemServicoMapper.ParaDto)
-                 .ToList();
+            return ordensServico
+                .Select(OrdemServicoMapper.ParaDto)
+                .ToList();
+        }
+
+        public async Task<ResultadoPaginadoOrdemServicoDto> ListarPaginado(FiltroOrdemServicoDto filtro)
+        {
+            var permitido = await _usuarioLogado.VerificarSeTemPermissao(Permissoes.OSVisualizarTodas);
+            //var idUsuarioParaFiltrar = permitido ? null : _usuarioLogado.IdUsuario;
+
+            string? idUsuarioParaFiltrar = null;
+
+            if (!permitido)
+            {
+                idUsuarioParaFiltrar = _usuarioLogado.retornarUserLogado();
+            }
+
+            var (itens, total) = await _repository.ListarPaginado(filtro, idUsuarioParaFiltrar);
+
+            return new ResultadoPaginadoOrdemServicoDto
+            {
+                Itens = itens.Select(OrdemServicoMapper.ParaDto).ToList(),
+                TotalRegistros = total,
+                Pagina = filtro.Pagina,
+                TamanhoPagina = filtro.TamanhoPagina,
+            };
         }
 
         // Só atualiza o relatório técnico, sem tocar em mais nenhum campo da OS.

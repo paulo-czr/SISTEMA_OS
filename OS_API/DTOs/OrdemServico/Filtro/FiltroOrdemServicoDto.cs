@@ -1,9 +1,7 @@
 ﻿using OS_API.Models.Enum;
 
-namespace OS_API.DTOs.OrdemServico
+namespace OS_API.DTOs.OrdemServico.Filtro
 {
-    // Recebido via query string em GET /OrdemServico (ex.: ?pagina=1&tamanhoPagina=20&status=2).
-    // Todos os campos são opcionais — se não vier nada, lista normalmente (com paginação padrão).
     public class FiltroOrdemServicoDto
     {
         public int Pagina { get; set; } = 1;
@@ -18,7 +16,7 @@ namespace OS_API.DTOs.OrdemServico
         public DateTime? DataFimDe { get; set; }
         public DateTime? DataFimAte { get; set; }
 
-        // Texto livre: filtra por título da OS ou nome do cliente.
+ 
         public string? Busca { get; set; }
     }
 }
