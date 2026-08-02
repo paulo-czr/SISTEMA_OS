@@ -60,7 +60,6 @@ namespace OS_API.Models
             string tituloOs,
             int idTipoAtendimento,
             int idCliente,
-            DateTime? dataHoraInicio,
             DateTime? prazo,
             string descricao,
             string? observacao,
@@ -70,7 +69,6 @@ namespace OS_API.Models
             IdTipoAtendimento = idTipoAtendimento;
             IdCliente = idCliente;
             Status = StatusOs.Agendada;
-            DataHoraInicio = dataHoraInicio;
             Prazo = prazo;
             Descricao = descricao;
             Observacao = observacao;

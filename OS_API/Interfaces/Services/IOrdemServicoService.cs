@@ -1,5 +1,6 @@
 ﻿using OS_API.DTOs.Assinatura;
 using OS_API.DTOs.OrdemServico;
+using OS_API.DTOs.OrdemServico.Filtro;
 using OS_API.Models;
 
 namespace OS_API.Interfaces.Services
@@ -13,6 +14,8 @@ namespace OS_API.Interfaces.Services
         Task<BuscarOrdemServicoDto?> BuscarPorId(int id);
 
         Task<List<BuscarOrdemServicoDto>> Listar();
+
+        Task<ResultadoPaginadoOrdemServicoDto> ListarPaginado(FiltroOrdemServicoDto filtro);
 
         Task<BuscarOrdemServicoDto> AtualizarRelatorio(int id, AtualizarRelatorioDto dto);
 

@@ -1,4 +1,5 @@
-﻿using OS_API.Models;
+﻿using OS_API.DTOs.OrdemServico.Filtro;
+using OS_API.Models;
 using OS_API.Models.Cliente;
 
 namespace OS_API.Interfaces.Repositories
@@ -11,6 +12,7 @@ namespace OS_API.Interfaces.Repositories
 
         Task<List<OrdemServicoModel>> Listar();
 
+        Task<(List<OrdemServicoModel> Itens, int Total)> ListarPaginado(FiltroOrdemServicoDto filtro, string? idUsuarioFuncionario);
         Task Atualizar(OrdemServicoModel ordemServico);
 
         Task<OrdemServicoModel?> BuscarPorToken(string token);
