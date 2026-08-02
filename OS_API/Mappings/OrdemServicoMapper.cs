@@ -13,7 +13,6 @@ namespace OS_API.Mappings
                 dto.TituloOs,
                 dto.IdTipoAtendimento,
                 dto.IdCliente,
-                dto.DataHoraInicio,
                 dto.Prazo,
                 dto.Descricao,
                 dto.Observacao,
