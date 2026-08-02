@@ -1,4 +1,4 @@
-﻿namespace OS_API.DTOs.OrdemServico
+﻿namespace OS_API.DTOs.OrdemServico.Filtro
 {
     // Resposta de GET /OrdemServico — traz só os itens da página pedida,
     // mais o total pra o front montar os botões de paginação.
