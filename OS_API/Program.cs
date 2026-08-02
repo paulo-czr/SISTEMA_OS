@@ -123,15 +123,21 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<IUsuarioLogado, UsuarioLogado>();
 
-// Configuracao CORS para permitir o Front-end acessar a API
+// Configuracao CORS para permitir apenas as origens necessarias (front-end)
+var origensPermitidas = new[]
+{
+    "https://nortesys-os.vercel.app", // Front-end em producao (Vercel)
+    "http://localhost:5173"           // Front-end em desenvolvimento (Vite)
+};
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontEnd", policy =>
     {
         policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+            .WithOrigins(origensPermitidas)
+            .WithHeaders("Content-Type", "Authorization")
+            .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH");
     });
 });
 
