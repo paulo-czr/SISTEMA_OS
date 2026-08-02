@@ -156,7 +156,7 @@ builder.Services.AddRateLimiter(options =>
         {
             PermitLimit = 120,
             Window = TimeSpan.FromMinutes(1),
-            QueueProcessingOrder = QueueProcessOrder.OldestFirst,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             QueueLimit = 0
         });
     });
@@ -170,7 +170,7 @@ builder.Services.AddRateLimiter(options =>
         {
             PermitLimit = 5,
             Window = TimeSpan.FromMinutes(1),
-            QueueProcessingOrder = QueueProcessOrder.OldestFirst,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             QueueLimit = 0
         });
     });
@@ -185,7 +185,7 @@ builder.Services.AddRateLimiter(options =>
         {
             PermitLimit = 20,
             Window = TimeSpan.FromMinutes(1),
-            QueueProcessingOrder = QueueProcessOrder.OldestFirst,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             QueueLimit = 0
         });
     });
