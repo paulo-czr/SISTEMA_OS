@@ -64,7 +64,7 @@ namespace OS_API.Services
             // Validar se o Tipo de Atendimento informado existe.
             var tipoAten = await _TipoAtendimento.BuscarOuFalhar(dto.IdTipoAtendimento);
 
-            FalharDataInvalidas(dto.Prazo);
+            FalharDataPrazo(dto.Prazo);
 
 
             // Validar se existe apenas um funcionário marcado como responsável em dto.Funcionarios.
@@ -129,6 +129,7 @@ namespace OS_API.Services
 
             // não atualizar se tiver concluida
             falharSeOSConcluida(ordemServico);
+            FalharDataInvalidas(dto.Prazo, dto.DataHoraInicio, ordemServico.Prazo);
 
             OrdemServicoMapper.AtualizarModel(ordemServico, dto);
 
@@ -168,7 +169,6 @@ namespace OS_API.Services
         public async Task<ResultadoPaginadoOrdemServicoDto> ListarPaginado(FiltroOrdemServicoDto filtro)
         {
             var permitido = await _usuarioLogado.VerificarSeTemPermissao(Permissoes.OSVisualizarTodas);
-            //var idUsuarioParaFiltrar = permitido ? null : _usuarioLogado.IdUsuario;
 
             string? idUsuarioParaFiltrar = null;
 
@@ -188,7 +188,7 @@ namespace OS_API.Services
             };
         }
 
-        // Só atualiza o relatório técnico, sem tocar em mais nenhum campo da OS.
+       
         public async Task<BuscarOrdemServicoDto> AtualizarRelatorio(int id, AtualizarRelatorioDto dto)
         {
             var ordemServico = await BuscarOuFalhar(id);
@@ -208,7 +208,7 @@ namespace OS_API.Services
             return OrdemServicoMapper.ParaDto(ordemServico);
         }
 
-        // Só atualiza o status da OS, sem tocar em mais nenhum campo.
+  
         public async Task<BuscarOrdemServicoDto> AlterarStatus(int id, AlterarStatusOsDto dto)
         {
             var ordemServico = await BuscarOuFalhar(id);
@@ -229,27 +229,10 @@ namespace OS_API.Services
         public async Task Remover(int id)
         {
             var ordemServico = await BuscarOuFalhar(id);
-            // Validar se a OS pode ser removida (ex.: não permitir remoção de OS já concluída).
             falharSeOSConcluida(ordemServico);
             await _repository.Remover(ordemServico);
         }
 
-        private void falharSeOSConcluida(OrdemServicoModel ordemServico)
-        {
-            if (ordemServico.Status == StatusOs.Concluida)
-            {
-                throw new ValidacaoException("OS já concluída.");
-            }
-        }
-        private async Task<OrdemServicoModel> BuscarOuFalhar(int id)
-        {
-            var ordemServico = await _repository.BuscarPorId(id);
-
-            if (ordemServico == null)
-                throw new EntidadeNaoEncontradaException("Ordem de Serviço não encontrada.");
-
-            return ordemServico;
-        }
 
         //-----------------------------------------------------------
         // Funcionário responsável assina e gera o link/token de assinatura pro cliente.
@@ -339,7 +322,6 @@ namespace OS_API.Services
             
         }
 
-        // Dados públicos (sem login) pra tela que o cliente abre pelo link/QR code.
         public async Task<AssinaturaPublicaDto> BuscarAssinaturaPublica(string token)
         {
             var ordemServico = await _repository.BuscarPorToken(token);
@@ -369,7 +351,6 @@ namespace OS_API.Services
             };
         }
 
-        // Cliente confirma a assinatura  salva a assinatura + o PDF final, e invalida o token.
         public async Task SubmeterAssinaturaCliente(string token, SubmeterAssinaturaClienteDto dto)
         {
             try
@@ -425,30 +406,6 @@ namespace OS_API.Services
             return ordemServico.ArquivoPdf;
         }
 
-
-        private void FalharDataInvalidas(DateTime? prazo)
-        {
-            var agora = DateTime.Now;
-
-            var prazoLocal = prazo?.ToLocalTime();
-            //var inicioLocal = inicio?.ToLocalTime();
-
-            // Compara data E hora exata
-            if (prazoLocal < agora)
-            {
-                throw new ValidacaoException("O prazo não pode ser anterior à data e hora atual.");
-            }
-
-            //if (inicioLocal < agora)
-            //{
-            //    throw new ValidacaoException("A data de início não pode ser anterior à data e hora atual.");
-            //}
-
-            //if (inicioLocal > prazoLocal)
-            //{
-            //    throw new ValidacaoException("A data de início não pode ser maior que a data do prazo.");
-            //}
-        }
 
         public async Task<BuscarOrdemServicoDto?> BuscarPorTipoAtendimento(TipoAtendimento tipo)
         {
@@ -531,6 +488,60 @@ namespace OS_API.Services
         {
             var ordemServico = await BuscarOuFalhar(id);
             return ordemServico.ArquivoPdfFotos;
+        }
+
+
+        //metodos auxiliares
+        private void falharSeOSConcluida(OrdemServicoModel ordemServico)
+        {
+            if (ordemServico.Status == StatusOs.Concluida)
+            {
+                throw new ValidacaoException("OS já concluída.");
+            }
+        }
+        private async Task<OrdemServicoModel> BuscarOuFalhar(int id)
+        {
+            var ordemServico = await _repository.BuscarPorId(id);
+
+            if (ordemServico == null)
+                throw new EntidadeNaoEncontradaException("Ordem de Serviço não encontrada.");
+
+            return ordemServico;
+        }
+
+        private void FalharDataPrazo(DateTime? prazo)
+        {
+            var agora = DateTime.Now;
+            var prazoLocal = prazo?.ToLocalTime();
+            if (prazoLocal < agora)
+            {
+                throw new ValidacaoException("O prazo não pode ser anterior à data e hora atual.");
+            }
+            
+        }
+
+        private void FalharDataInvalidas(DateTime? prazo, DateTime? inicio, DateTime? prazoBanco)
+        {
+            var agora = DateTime.Now;
+
+            var prazoLocal = prazo?.ToLocalTime();
+            var prazolocalBanco = prazoBanco?.ToLocalTime();
+            var inicioLocal = inicio?.ToLocalTime();
+
+            if (prazoLocal < agora)
+            {
+                throw new ValidacaoException("O prazo não pode ser anterior à data e hora atual.");
+            }
+
+            if (inicioLocal > prazolocalBanco)
+            {
+                throw new ValidacaoException($"A data de início não pode ser maior que a data do prazo ja cadastrada:{prazolocalBanco}.");
+            }
+
+            if (inicioLocal > prazoLocal)
+            {
+                throw new ValidacaoException("A data de início não pode ser maior que a data do prazo.");
+            }
         }
     }
 }

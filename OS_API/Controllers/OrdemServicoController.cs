@@ -79,8 +79,6 @@ namespace OS_API.Controllers
             var ordensServico = await _service.Listar();
             return Ok(ordensServico);
         }
-
-      
        
         [HttpGet("paginado")]
         [Authorize]
