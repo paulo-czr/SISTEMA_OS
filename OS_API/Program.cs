@@ -27,6 +27,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// Health Check do banco de dados
+builder.Services.AddHealthChecks()
+    .AddNpgSql(
+        builder.Configuration.GetConnectionString("DefaultConnection")!,
+        name: "banco",
+        tags: new[] { "db" });
+
 // Configura��o do ASP.NET Core Identity
 builder.Services
     .AddIdentity<UsuarioModel, IdentityRole>(options =>
@@ -138,6 +145,15 @@ builder.Services.AddCors(options =>
             .WithOrigins(origensPermitidas)
             .WithHeaders("Content-Type", "Authorization")
             .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH");
+    });
+
+    // Política separada para as rotas PÚBLICAS/anônimas (assinatura e fotos por token).
+    options.AddPolicy("PublicoToken", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .WithHeaders("Content-Type")
+            .WithMethods("GET", "POST");
     });
 });
 
