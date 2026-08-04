@@ -139,6 +139,20 @@ builder.Services.AddCors(options =>
             .WithHeaders("Content-Type", "Authorization")
             .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH");
     });
+
+    // Política separada para as rotas PÚBLICAS/anônimas (assinatura e fotos por token).
+    // Essas rotas são acessadas pelo dispositivo do cliente (link enviado por WhatsApp/e-mail,
+    // QR code etc.), então a origem de quem chama não é previsível como a do nosso front-end.
+    // Por isso liberamos qualquer origem aqui — mas SOMENTE para essas rotas, que já são
+    // protegidas por token de uso único, AllowAnonymous e rate limiting ("publico").
+    // Não usamos AllowCredentials, então nenhum cookie/credencial é exposto a terceiros.
+    options.AddPolicy("PublicoToken", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .WithHeaders("Content-Type")
+            .WithMethods("GET", "POST");
+    });
 });
 
 // Rate Limiting - protege a API contra abuso, brute-force e DoS
