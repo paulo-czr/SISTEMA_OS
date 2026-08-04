@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OS_API.DTOs.Cliente;
+using OS_API.DTOs.Cliente.Filtro;
+using OS_API.DTOs.OrdemServico.Filtro;
 using OS_API.Helpers.Constantes;
 using OS_API.Interfaces.Services;
 
@@ -59,6 +61,14 @@ namespace OS_API.Controllers
         public async Task<IActionResult> Listar()
         {
             var clientes = await _clienteService.Listar();
+            return Ok(clientes);
+        }
+
+        [HttpGet("paginado")]
+        [Authorize(Policy = Permissoes.ClienteVisualizar)]
+        public async Task<IActionResult> ListarPaginado([FromQuery] FiltroClienteDto filtro)
+        {
+            var clientes = await _clienteService.ListarPaginado(filtro);
             return Ok(clientes);
         }
 

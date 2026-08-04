@@ -1,4 +1,5 @@
 using OS_API.DTOs.Cliente;
+using OS_API.DTOs.Cliente.Filtro;
 using OS_API.DTOs.ViaCepDto;
 using OS_API.Exceptionn;
 using OS_API.Interfaces.Repositories;
@@ -70,6 +71,18 @@ namespace OS_API.Services
             return clientes
                 .Select(ClienteMapper.ParaDto)
                 .ToList();
+        }
+
+        public async Task<ResultadoPaginadoClienteDto> ListarPaginado(FiltroClienteDto filtro)
+        {
+            var (item, total) = await _repository.ListarPaginado(filtro);
+
+            return new ResultadoPaginadoClienteDto
+            {
+                Itens = item.Select(ClienteMapper.ParaDto).ToList(),
+                Pagina = filtro.Pagina,
+                TotalRegistros = total,
+            };
         }
 
 
@@ -185,5 +198,7 @@ namespace OS_API.Services
 
             return cliente;
         }
+
+        
     }    
 }

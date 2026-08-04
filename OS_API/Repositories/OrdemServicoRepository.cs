@@ -98,7 +98,7 @@ namespace OS_API.Repositories
                     o.Cliente.NomeFantasia.ToLower().Contains(termo));
             }
 
-            query = query.OrderByDescending(o => o.DataHoraInicio);
+            query = query.OrderByDescending(o => o.IdOs);
 
             var total = await query.CountAsync();
 
