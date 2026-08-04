@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using OS_API.DTOs.Assinatura;
@@ -150,6 +151,7 @@ namespace OS_API.Controllers
         [HttpGet("assinatura/{token}")]
         [AllowAnonymous]
         [EnableRateLimiting("publico")]
+        [EnableCors("PublicoToken")]
         public async Task<IActionResult> BuscarAssinaturaPublica(string token)
         {
             var dados = await _service.BuscarAssinaturaPublica(token);
@@ -160,6 +162,7 @@ namespace OS_API.Controllers
         [HttpPost("assinatura/{token}")]
         [AllowAnonymous]
         [EnableRateLimiting("publico")]
+        [EnableCors("PublicoToken")]
         public async Task<IActionResult> SubmeterAssinaturaCliente(string token, [FromBody] SubmeterAssinaturaClienteDto dto)
         {
             await _service.SubmeterAssinaturaCliente(token, dto);
@@ -193,6 +196,7 @@ namespace OS_API.Controllers
         [HttpGet("fotos/{token}")]
         [AllowAnonymous]
         [EnableRateLimiting("publico")]
+        [EnableCors("PublicoToken")]
         public async Task<IActionResult> BuscarFotosPublica(string token)
         {
             var dados = await _service.BuscarFotosPublica(token);
@@ -202,6 +206,7 @@ namespace OS_API.Controllers
         [HttpPost("fotos/{token}")]
         [AllowAnonymous]
         [EnableRateLimiting("publico")]
+        [EnableCors("PublicoToken")]
         public async Task<IActionResult> SalvarFotos(string token, [FromBody] SalvarFotosDto dto)
         {
             await _service.SalvarFotos(token, dto);
