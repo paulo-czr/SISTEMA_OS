@@ -137,25 +137,38 @@ var origensPermitidas = new[]
     "http://localhost:5173"           // Front-end em desenvolvimento (Vite)
 };
 
+
+// Configuracao CORS para permitir o Front-end acessar a API
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontEnd", policy =>
     {
         policy
-            .WithOrigins(origensPermitidas)
-            .WithHeaders("Content-Type", "Authorization")
-            .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH");
-    });
-
-    // Política separada para as rotas PÚBLICAS/anônimas (assinatura e fotos por token).
-    options.AddPolicy("PublicoToken", policy =>
-    {
-        policy
-            .AllowAnyOrigin()
-            .WithHeaders("Content-Type")
-            .WithMethods("GET", "POST");
+            .SetIsOriginAllowed(_ => true) // Permite qualquer origem (inclusive localhost, render, etc)
+            .AllowAnyHeader()               // Libera Authorization, Content-Type, etc.
+            .AllowAnyMethod();              // Libera GET, POST, PUT, DELETE, OPTIONS, PATCH
     });
 });
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("FrontEnd", policy =>
+//    {
+//        policy
+//            .WithOrigins(origensPermitidas)
+//            .WithHeaders("Content-Type", "Authorization")
+//            .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH");
+//    });
+
+//    // Política separada para as rotas PÚBLICAS/anônimas (assinatura e fotos por token).
+//    options.AddPolicy("PublicoToken", policy =>
+//    {
+//        policy
+//            .AllowAnyOrigin()
+//            .WithHeaders("Content-Type")
+//            .WithMethods("GET", "POST");
+//    });
+//});
 
 // Rate Limiting - protege a API contra abuso, brute-force e DoS
 builder.Services.AddRateLimiter(options =>
