@@ -14,6 +14,7 @@ namespace OS_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("FrontEnd")]
     public class OrdemServicoController : ControllerBase
     {
         private readonly IOrdemServicoService _service;
@@ -136,8 +137,7 @@ namespace OS_API.Controllers
             return NoContent();
         }
 
-
-        //-----------------------------------------
+        
         // Funcionário responsável assina e gera o link/token de assinatura pro cliente.
         [HttpPost("{id}/relatorio/iniciar-assinatura")]
         [Authorize(Policy = Permissoes.OSAtualizar)]
@@ -151,7 +151,7 @@ namespace OS_API.Controllers
         [HttpGet("assinatura/{token}")]
         [AllowAnonymous]
         [EnableRateLimiting("publico")]
-        [EnableCors("PublicoToken")]
+        // [EnableCors("PublicoToken")]
         public async Task<IActionResult> BuscarAssinaturaPublica(string token)
         {
             var dados = await _service.BuscarAssinaturaPublica(token);
@@ -162,7 +162,7 @@ namespace OS_API.Controllers
         [HttpPost("assinatura/{token}")]
         [AllowAnonymous]
         [EnableRateLimiting("publico")]
-        [EnableCors("PublicoToken")]
+        // [EnableCors("PublicoToken")]
         public async Task<IActionResult> SubmeterAssinaturaCliente(string token, [FromBody] SubmeterAssinaturaClienteDto dto)
         {
             await _service.SubmeterAssinaturaCliente(token, dto);
@@ -196,7 +196,7 @@ namespace OS_API.Controllers
         [HttpGet("fotos/{token}")]
         [AllowAnonymous]
         [EnableRateLimiting("publico")]
-        [EnableCors("PublicoToken")]
+        //[EnableCors("PublicoToken")]
         public async Task<IActionResult> BuscarFotosPublica(string token)
         {
             var dados = await _service.BuscarFotosPublica(token);
@@ -206,7 +206,7 @@ namespace OS_API.Controllers
         [HttpPost("fotos/{token}")]
         [AllowAnonymous]
         [EnableRateLimiting("publico")]
-        [EnableCors("PublicoToken")]
+        // [EnableCors("PublicoToken")]
         public async Task<IActionResult> SalvarFotos(string token, [FromBody] SalvarFotosDto dto)
         {
             await _service.SalvarFotos(token, dto);
