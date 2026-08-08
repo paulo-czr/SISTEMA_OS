@@ -415,14 +415,17 @@ namespace OS_API.Services
         }
 
 
-
-
         //parte das fotos pdf
-        // Gera o link/token pra registrar fotos 2H
         public async Task<TokenAssinaturaDto> IniciarFotos(int id)
         {
             var ordemServico = await BuscarOuFalhar(id);
             //falharSeOSConcluida(ordemServico);
+
+            //verificar se ja passou 24h depois da finalização da OS e da erro 
+            if (ordemServico.DataHoraFim.HasValue && ordemServico.DataHoraFim.Value.AddHours(24) <= DateTime.Now)
+            {
+                throw new ValidacaoException("Não é possivel adicionar fotos nessa OS, pois ja se passaram 24h depois da finalização.");
+            }
 
             int idFuncionario = await _usuarioLogado.RetornarIdFuncionarioLogado();
             if (!await _osFuncionarioService.VerificarTecnicoEResponsavelAsync(ordemServico.IdOs, idFuncionario))

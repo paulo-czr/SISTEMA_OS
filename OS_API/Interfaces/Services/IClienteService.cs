@@ -1,4 +1,6 @@
 ﻿using OS_API.DTOs.Cliente;
+using OS_API.DTOs.Cliente.Filtro;
+using OS_API.DTOs.OrdemServico.Filtro;
 using OS_API.Models.Cliente;
 
 namespace OS_API.Interfaces.Services
@@ -14,6 +16,8 @@ namespace OS_API.Interfaces.Services
         Task<ClienteDto?> BuscarPorDocumento(string documento);
 
         Task<List<ClienteDto>> Listar();
+
+        Task<ResultadoPaginadoClienteDto> ListarPaginado(FiltroClienteDto filtro);
 
         Task<ClienteModel> BuscarClienteOuFalhar(int id);
 

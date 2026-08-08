@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OS_API.Data;
+using OS_API.DTOs.Cliente.Filtro;
 using OS_API.Interfaces.Repositories;
 using OS_API.Models.Cliente;
 
@@ -58,6 +59,32 @@ namespace OS_API.Repositories
                 .ToListAsync();
         }
 
+        public async Task<(List<ClienteModel> Itens, int Total)> ListarPaginado(FiltroClienteDto filtro)
+        {
+            var query = _context.Clientes.AsQueryable();
+            query.Where(c => c.Ativo);
+            if (!string.IsNullOrWhiteSpace(filtro.Busca))
+            {
+                var termo = filtro.Busca.Trim().ToLower();
+                query = query.Where(c =>
+                    c.NomeFantasia.ToLower().Contains(termo) ||
+                    c.RazaoSocial.ToLower().Contains(termo)||
+                    c.Documento.Contains(termo));
+            }
+
+            query = query.OrderByDescending(c => c.IdCliente);
+
+            var total = await query.CountAsync();
+
+            var itens = await query
+                .Skip((filtro.Pagina - 1) * filtro.TamanhoPagina)
+                .Take(filtro.TamanhoPagina)
+                .ToListAsync();
+
+            return (itens, total);
+
+        }
+
         public async Task Atualizar(ClienteModel cliente)
         {
             // Evitando marcar o objeto inteiro como modificado sem necessidade.
@@ -72,5 +99,7 @@ namespace OS_API.Repositories
             _context.Clientes.Remove(cliente);
             await _context.SaveChangesAsync();
         }
+
+        
     }
 }

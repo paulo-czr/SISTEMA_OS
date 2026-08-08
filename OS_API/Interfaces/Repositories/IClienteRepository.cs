@@ -1,3 +1,6 @@
+using OS_API.DTOs.Cliente.Filtro;
+using OS_API.DTOs.OrdemServico.Filtro;
+using OS_API.Models;
 using OS_API.Models.Cliente;
 
 namespace OS_API.Interfaces.Repositories
@@ -17,6 +20,8 @@ namespace OS_API.Interfaces.Repositories
         Task<bool> ExisteEmailEmOutroCliente(string email, int idCliente);
 
         Task<List<ClienteModel>> Listar();
+
+        Task<(List<ClienteModel> Itens, int Total)> ListarPaginado(FiltroClienteDto filtro);
 
         Task Atualizar(ClienteModel cliente);
 
